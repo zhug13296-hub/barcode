@@ -1,35 +1,29 @@
 name: Build APK
 
 on:
-workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
-build:
-runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-```
-defaults:
-  run:
-    working-directory: barcode-offline-android
+    steps:
+      - uses: actions/checkout@v4
 
-steps:
-  - uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
 
-  - name: Setup JDK
-    uses: actions/setup-java@v4
-    with:
-      distribution: temurin
-      java-version: '11'
+      - name: Grant Permission
+        run: chmod +x gradlew
 
-  - name: Grant Permission
-    run: chmod +x gradlew
+      - name: Build APK
+        run: ./gradlew assembleDebug
 
-  - name: Build APK
-    run: ./gradlew assembleDebug
-
-  - name: Upload APK
-    uses: actions/upload-artifact@v4
-    with:
-      name: apk
-      path: barcode-offline-android/app/build/outputs/apk/debug/*.apk
-```
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: app/build/outputs/apk/debug/*.apk
