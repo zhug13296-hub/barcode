@@ -34,14 +34,15 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.core.content.FileProvider;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
-import com.journeyapps.barcodescanner.IntentIntegrator;
-import com.journeyapps.barcodescanner.IntentResult;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -74,10 +75,22 @@ public class MainActivity extends Activity {
     private BarcodeFormat currentFormat = BarcodeFormat.QR_CODE;
     private final ArrayList<String> historyItems = new ArrayList<>();
     private ArrayAdapter<String> historyAdapter;
+    private ActivityResultLauncher<ScanOptions> scanLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        scanLauncher = registerForActivityResult(new ScanContract(), result -> {
+            if (result.getContents() != null) {
+                latestValue = result.getContents();
+                vibrateOnce();
+                copyText(latestValue);
+                addHistory("扫描", result.getFormatName(), latestValue);
+                showResult("扫描结果", latestValue, result.getFormatName());
+            } else {
+                toast("已取消扫码");
+            }
+        });
         loadHistory();
         showHome();
     }
@@ -102,13 +115,13 @@ public class MainActivity extends Activity {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CAMERA);
             return;
         }
-        IntentIntegrator integrator = new IntentIntegrator(this);
-        integrator.setPrompt("将条码放入框内自动识别");
-        integrator.setBeepEnabled(true);
-        integrator.setBarcodeImageEnabled(false);
-        integrator.setOrientationLocked(false);
-        integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
-        integrator.initiateScan();
+        ScanOptions options = new ScanOptions();
+        options.setPrompt("将条码放入框内自动识别");
+        options.setBeepEnabled(true);
+        options.setBarcodeImageEnabled(false);
+        options.setOrientationLocked(false);
+        options.setDesiredBarcodeFormats(ScanOptions.ALL_CODE_TYPES);
+        scanLauncher.launch(options);
     }
 
     @Override
@@ -121,24 +134,6 @@ public class MainActivity extends Activity {
         } else {
             toast(requestCode == REQ_CAMERA ? "没有相机权限，无法扫码" : "没有存储权限，无法保存图片");
         }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (result != null) {
-            if (result.getContents() != null) {
-                latestValue = result.getContents();
-                vibrateOnce();
-                copyText(latestValue);
-                addHistory("扫描", result.getFormatName(), latestValue);
-                showResult("扫描结果", latestValue, result.getFormatName());
-            } else {
-                toast("已取消扫码");
-            }
-            return;
-        }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void showResult(String titleText, String value, String formatName) {
