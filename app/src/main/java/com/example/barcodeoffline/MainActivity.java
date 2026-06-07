@@ -1,7 +1,7 @@
 package com.example.barcodeoffline;
 
 import android.Manifest;
-import android.app.Activity;
+import androidx.activity.ComponentActivity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentValues;
@@ -55,7 +55,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class MainActivity extends Activity {
+public class MainActivity extends ComponentActivity {
     private static final int REQ_CAMERA = 1001;
     private static final int REQ_STORAGE = 1002;
     private static final int EYE_BG = Color.rgb(250, 244, 224);
