@@ -182,6 +182,7 @@ public class ScanActivity extends ComponentActivity {
                     selectedFormats.remove("ALL");
                     if (isChecked) {
                         if (!selectedFormats.contains(format)) selectedFormats.add(format);
+                        refreshChips();
                     } else {
                         selectedFormats.remove(format);
                         if (selectedFormats.isEmpty()) {
@@ -218,6 +219,7 @@ public class ScanActivity extends ComponentActivity {
                     selectedFormats.remove("ALL");
                     if (isChecked) {
                         if (!selectedFormats.contains(fmt)) selectedFormats.add(fmt);
+                        refreshChips();
                     } else {
                         selectedFormats.remove(fmt);
                         if (selectedFormats.isEmpty()) {
@@ -279,7 +281,10 @@ public class ScanActivity extends ComponentActivity {
 
             Map<DecodeHintType, Object> hints = new EnumMap<>(DecodeHintType.class);
             hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
-            hints.put(DecodeHintType.POSSIBLE_FORMATS, getSelectedFormats());
+            Collection<com.google.zxing.BarcodeFormat> selectedFmts = getSelectedFormats();
+            if (selectedFmts != null && !selectedFmts.isEmpty()) {
+                hints.put(DecodeHintType.POSSIBLE_FORMATS, selectedFmts);
+            }
 
             Result result = new MultiFormatReader().decode(binaryBitmap, hints);
             if (result != null) {
@@ -295,17 +300,18 @@ public class ScanActivity extends ComponentActivity {
     }
 
     private Collection<com.google.zxing.BarcodeFormat> getSelectedFormats() {
-        List<com.google.zxing.BarcodeFormat> formats = new ArrayList<>();
         for (String f : selectedFormats) {
             if (f.equals("ALL")) {
-                // Return empty to let reader try all formats
-                return new ArrayList<>();
+                return null;  // null = try all formats
             }
+        }
+        List<com.google.zxing.BarcodeFormat> formats = new ArrayList<>();
+        for (String f : selectedFormats) {
             try {
                 formats.add(com.google.zxing.BarcodeFormat.valueOf(f));
             } catch (Exception ignored) {}
         }
-        return formats.isEmpty() ? new ArrayList<>() : formats;
+        return formats.isEmpty() ? null : formats;
     }
 
     private void onScanResult(String content, String formatName) {
