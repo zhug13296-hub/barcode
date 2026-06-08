@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 背景层 -->
+    <color name="bg_primary">#FBF6E9</color>
+    <color name="bg_surface">#FFFCF2</color>
+    <color name="bg_surface_variant">#F7F0DE</color>
+    <color name="bg_surface_elevated">#FFFEF8</color>
+
+    <!-- 主色 -->
+    <color name="primary">#7B5B3A</color>
+    <color name="primary_light">#A07D5A</color>
+    <color name="primary_dark">#5C3D1E</color>
+    <color name="primary_container">#F0E0C8</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="on_primary_container">#3E2410</color>
+
+    <!-- 强调色 -->
+    <color name="accent">#C08B4B</color>
+    <color name="accent_light">#D9AD72</color>
+    <color name="accent_container">#F5E6D0</color>
+
+    <!-- 文字 -->
+    <color name="text_primary">#2C1E0F</color>
+    <color name="text_secondary">#7A6550</color>
+    <color name="text_hint">#B09A80</color>
+    <color name="text_on_surface">#3D2C18</color>
+
+    <!-- 功能色 -->
+    <color name="success">#5E9C42</color>
+    <color name="success_container">#E2F2D8</color>
+    <color name="warning">#D4952B</color>
+    <color name="warning_container">#FBF0D8</color>
+    <color name="error">#C25550</color>
+    <color name="error_container">#FBDEDD</color>
+    <color name="info">#5088B8</color>
+    <color name="info_container">#DAEAF5</color>
+
+    <!-- 标签色 -->
+    <color name="badge_scan">#5088B8</color>
+    <color name="badge_generate">#5E9C42</color>
+    <color name="badge_batch">#8B6DAF</color>
+
+    <!-- 边框/分隔 -->
+    <color name="outline">#D8CAB2</color>
+    <color name="outline_variant">#E8DFCF</color>
+    <color name="divider">#E5DCC8</color>
+
+    <!-- 系统栏 -->
+    <color name="status_bar">#F0E8D2</color>
+    <color name="nav_bar">#F0E8D2</color>
+
+    <!-- 涟漪 -->
+    <color name="ripple">#207B5B3A</color>
+    <color name="ripple_light">#15C08B4B</color>
+
+    <!-- 纯色 -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="scrim">#40000000</color>
+</resources>

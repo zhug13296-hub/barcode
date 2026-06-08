@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_primary">
+
+    <!-- 顶部工具栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/space_lg"
+        android:background="@color/bg_surface"
+        android:elevation="@dimen/elevation_low">
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_back"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="back" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="生成条码"
+            android:textSize="18sp"
+            android:textColor="@color/text_primary"
+            android:fontFamily="sans-serif-medium"
+            android:paddingStart="@dimen/space_sm" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/space_lg">
+
+            <!-- 输入框 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="@dimen/radius_md"
+                app:cardElevation="@dimen/elevation_low"
+                app:cardBackgroundColor="@color/bg_surface"
+                android:layout_marginBottom="@dimen/space_lg">
+                <EditText
+                    android:id="@+id/input_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:hint="输入要生成的内容..."
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_hint"
+                    android:textSize="15sp"
+                    android:minLines="3"
+                    android:maxLines="6"
+                    android:gravity="top"
+                    android:padding="@dimen/card_padding"
+                    android:inputType="textMultiLine" />
+            </androidx.cardview.widget.CardView>
+
+            <!-- 格式选择标题 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="条码格式"
+                android:textSize="13sp"
+                android:textColor="@color/text_hint"
+                android:paddingBottom="@dimen/space_sm" />
+
+            <!-- 格式选择 chips -->
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/format_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                app:chipSpacing="6dp"
+                android:paddingBottom="@dimen/space_lg" />
+
+            <!-- 预览卡片 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="@dimen/radius_md"
+                app:cardElevation="@dimen/elevation_mid"
+                app:cardBackgroundColor="@color/bg_surface"
+                android:layout_marginBottom="@dimen/space_sm">
+                <ImageView
+                    android:id="@+id/preview_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="260dp"
+                    android:scaleType="fitCenter"
+                    android:padding="@dimen/space_lg"
+                    android:background="@color/white"
+                    android:contentDescription="preview" />
+            </androidx.cardview.widget.CardView>
+
+            <!-- 信息标签 -->
+            <TextView
+                android:id="@+id/info_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/text_hint"
+                android:gravity="center"
+                android:paddingBottom="@dimen/space_lg" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- 底部按钮 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/space_lg"
+        android:background="@color/bg_surface"
+        android:elevation="@dimen/elevation_high">
+        <TextView
+            android:id="@+id/btn_generate"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/btn_height_lg"
+            android:background="@drawable/bg_btn_primary"
+            android:gravity="center"
+            android:text="生成预览"
+            android:textColor="@color/on_primary"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium"
+            android:clickable="true"
+            android:focusable="true" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/space_sm">
+            <TextView
+                android:id="@+id/btn_save"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/btn_height_md"
+                android:layout_weight="1"
+                android:background="@drawable/bg_btn_secondary"
+                android:gravity="center"
+                android:text="保存图片"
+                android:textColor="@color/primary"
+                android:textSize="14sp"
+                android:layout_marginEnd="6dp"
+                android:clickable="true"
+                android:focusable="true" />
+            <TextView
+                android:id="@+id/btn_share"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/btn_height_md"
+                android:layout_weight="1"
+                android:background="@drawable/bg_btn_secondary"
+                android:gravity="center"
+                android:text="分享图片"
+                android:textColor="@color/primary"
+                android:textSize="14sp"
+                android:layout_marginStart="6dp"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
