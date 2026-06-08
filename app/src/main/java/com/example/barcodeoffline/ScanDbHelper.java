@@ -17,7 +17,7 @@ import java.util.List;
 public class ScanDbHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "barcode_history.db";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
     private static final String TABLE = "scan_history";
 
     public static final int MODE_SCAN = 0;
@@ -30,6 +30,7 @@ public class ScanDbHelper extends SQLiteOpenHelper {
         public String content;
         public long timestamp;
         public int batchIndex;  // 批量扫描序号, 0=非批量
+        public boolean isFavorite;
 
         public Record() {}
 
@@ -46,7 +47,8 @@ public class ScanDbHelper extends SQLiteOpenHelper {
             String batchStr = batchIndex > 0 ? " #" + batchIndex : "";
             String time = new java.text.SimpleDateFormat("MM-dd HH:mm", java.util.Locale.CHINA)
                     .format(new java.util.Date(timestamp));
-            return time + "  [" + modeStr + batchStr + "/" + format + "]  " + content;
+            String star = isFavorite ? "⭐" : "";
+            return star + time + "  [" + modeStr + batchStr + "/" + format + "]  " + content;
         }
     }
 
@@ -62,7 +64,8 @@ public class ScanDbHelper extends SQLiteOpenHelper {
                 "format TEXT," +
                 "content TEXT NOT NULL," +
                 "timestamp INTEGER NOT NULL," +
-                "batch_index INTEGER NOT NULL DEFAULT 0" +
+                "batch_index INTEGER NOT NULL DEFAULT 0," +
+                "is_favorite INTEGER NOT NULL DEFAULT 0" +
                 ")");
         db.execSQL("CREATE INDEX idx_timestamp ON " + TABLE + "(timestamp DESC)");
         db.execSQL("CREATE INDEX idx_content ON " + TABLE + "(content)");
@@ -71,8 +74,9 @@ public class ScanDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE);
-        onCreate(db);
+        if (oldVersion < 2) {
+            db.execSQL("ALTER TABLE " + TABLE + " ADD COLUMN is_favorite INTEGER NOT NULL DEFAULT 0");
+        }
     }
 
     /** 插入记录，返回ID */
@@ -84,6 +88,7 @@ public class ScanDbHelper extends SQLiteOpenHelper {
         cv.put("content", record.content);
         cv.put("timestamp", record.timestamp);
         cv.put("batch_index", record.batchIndex);
+        cv.put("is_favorite", record.isFavorite ? 1 : 0);
         long id = db.insert(TABLE, null, cv);
         record.id = id;
         return id;
@@ -189,6 +194,28 @@ public class ScanDbHelper extends SQLiteOpenHelper {
         return n;
     }
 
+    /** 切换收藏状态 */
+    public void toggleFavorite(long id) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("UPDATE " + TABLE + " SET is_favorite = 1 - is_favorite WHERE id = ?",
+                new String[]{String.valueOf(id)});
+    }
+
+    /** 查询收藏记录 */
+    public List<Record> queryFavorites() {
+        return query("SELECT * FROM " + TABLE + " WHERE is_favorite=1 ORDER BY timestamp DESC LIMIT 200", null);
+    }
+
+    /** 统计收藏数 */
+    public int countFavorites() {
+        Cursor c = getReadableDatabase().rawQuery(
+                "SELECT COUNT(*) FROM " + TABLE + " WHERE is_favorite=1", null);
+        c.moveToFirst();
+        int n = c.getInt(0);
+        c.close();
+        return n;
+    }
+
     /** 获取去重的内容列表（用于批量导出） */
     public List<String> getDistinctContents() {
         List<String> list = new ArrayList<>();
@@ -204,7 +231,7 @@ public class ScanDbHelper extends SQLiteOpenHelper {
     /** 导出全部记录为CSV格式 */
     public String exportCsv() {
         StringBuilder sb = new StringBuilder();
-        sb.append("ID,类型,格式,内容,时间,批量序号\n");
+        sb.append("ID,类型,格式,内容,时间,批量序号,收藏\n");
         List<Record> records = query("SELECT * FROM " + TABLE + " ORDER BY timestamp DESC", null);
         for (Record r : records) {
             sb.append(r.id).append(",");
@@ -213,7 +240,8 @@ public class ScanDbHelper extends SQLiteOpenHelper {
             sb.append(escapeCsv(r.content)).append(",");
             sb.append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.CHINA)
                     .format(new java.util.Date(r.timestamp))).append(",");
-            sb.append(r.batchIndex).append("\n");
+            sb.append(r.batchIndex).append(",");
+            sb.append(r.isFavorite ? "是" : "否").append("\n");
         }
         return sb.toString();
     }
@@ -231,7 +259,8 @@ public class ScanDbHelper extends SQLiteOpenHelper {
             sb.append("\"format\":\"").append(escapeJson(r.format)).append("\",");
             sb.append("\"content\":\"").append(escapeJson(r.content)).append("\",");
             sb.append("\"timestamp\":").append(r.timestamp).append(",");
-            sb.append("\"batchIndex\":").append(r.batchIndex);
+            sb.append("\"batchIndex\":").append(r.batchIndex).append(",");
+            sb.append("\"isFavorite\":").append(r.isFavorite);
             sb.append("}");
             if (i < records.size() - 1) sb.append(",");
             sb.append("\n");
@@ -253,6 +282,7 @@ public class ScanDbHelper extends SQLiteOpenHelper {
             r.content = c.getString(c.getColumnIndexOrThrow("content"));
             r.timestamp = c.getLong(c.getColumnIndexOrThrow("timestamp"));
             r.batchIndex = c.getInt(c.getColumnIndexOrThrow("batch_index"));
+            r.isFavorite = c.getInt(c.getColumnIndexOrThrow("is_favorite")) == 1;
             list.add(r);
         }
         c.close();

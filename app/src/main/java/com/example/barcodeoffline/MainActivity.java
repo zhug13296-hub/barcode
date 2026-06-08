@@ -41,6 +41,13 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.card_gallery).setOnClickListener(v ->
                 startActivity(new Intent(this, ScanActivity.class)
                         .putExtra("openGallery", true)));
+
+        findViewById(R.id.card_favorites).setOnClickListener(v ->
+                startActivity(new Intent(this, HistoryActivity.class)
+                        .putExtra("showFavorites", true)));
+
+        findViewById(R.id.btn_settings).setOnClickListener(v ->
+                startActivity(new Intent(this, SettingsActivity.class)));
     }
 
     @Override

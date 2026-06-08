@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- ==================== Base Theme ==================== -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:statusBarColor">@color/status_bar</item>
         <item name="android:navigationBarColor">@color/nav_bar</item>
@@ -14,8 +15,10 @@
         <item name="colorOnSurface">@color/text_on_surface</item>
         <item name="shapeAppearanceSmallComponent">@style/ShapeSmall</item>
         <item name="shapeAppearanceMediumComponent">@style/ShapeMedium</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeLarge</item>
     </style>
 
+    <!-- ==================== Shape Styles ==================== -->
     <style name="ShapeSmall" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/radius_sm</item>
@@ -26,17 +29,22 @@
         <item name="cornerSize">@dimen/radius_md</item>
     </style>
 
-    <!-- 文字样式 -->
+    <style name="ShapeLarge" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/radius_lg</item>
+    </style>
+
+    <!-- ==================== Text Styles ==================== -->
     <style name="Text.Headline" parent="TextAppearance.MaterialComponents.Headline4">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">28sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif</item>
     </style>
 
     <style name="Text.Title" parent="TextAppearance.MaterialComponents.Headline6">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">20sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif</item>
     </style>
 
     <style name="Text.Subtitle" parent="TextAppearance.MaterialComponents.Subtitle1">
@@ -61,47 +69,72 @@
     <style name="Text.Label" parent="TextAppearance.MaterialComponents.Overline">
         <item name="android:textColor">@color/text_secondary</item>
         <item name="android:textSize">13sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif</item>
     </style>
 
-    <!-- 按钮样式 -->
+    <!-- ==================== Button Styles ==================== -->
+    <!-- Primary filled button -->
     <style name="Btn.Primary" parent="Widget.MaterialComponents.Button">
         <item name="backgroundTint">@color/primary</item>
         <item name="android:textColor">@color/on_primary</item>
         <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">sans-serif</item>
         <item name="cornerRadius">@dimen/radius_sm</item>
         <item name="android:stateListAnimator">@null</item>
         <item name="elevation">@dimen/elevation_low</item>
+        <item name="android:minHeight">@dimen/btn_height_md</item>
+        <item name="rippleColor">#302563EB</item>
     </style>
 
+    <!-- Secondary outlined button -->
     <style name="Btn.Secondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="strokeColor">@color/outline</item>
+        <item name="strokeColor">@color/primary</item>
+        <item name="strokeWidth">1.5dp</item>
         <item name="android:textColor">@color/primary</item>
         <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">sans-serif</item>
         <item name="cornerRadius">@dimen/radius_sm</item>
         <item name="backgroundTint">@color/bg_surface</item>
+        <item name="android:minHeight">@dimen/btn_height_md</item>
+        <item name="rippleColor">#302563EB</item>
     </style>
 
+    <!-- Text button (ghost) -->
     <style name="Btn.Text" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">@color/accent</item>
+        <item name="android:textColor">@color/primary</item>
         <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="rippleColor">#302563EB</item>
     </style>
 
-    <!-- 卡片样式 -->
+    <!-- Accent / CTA button -->
+    <style name="Btn.Accent" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/accent</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="cornerRadius">@dimen/radius_sm</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="elevation">@dimen/elevation_low</item>
+        <item name="android:minHeight">@dimen/btn_height_md</item>
+        <item name="rippleColor">#30F59E0B</item>
+    </style>
+
+    <!-- ==================== Card Style ==================== -->
     <style name="Card" parent="Widget.MaterialComponents.CardView">
         <item name="cardCornerRadius">@dimen/radius_md</item>
         <item name="cardElevation">@dimen/elevation_low</item>
         <item name="cardBackgroundColor">@color/bg_surface</item>
-        <item name="strokeColor">@color/outline_variant</item>
-        <item name="strokeWidth">0.5dp</item>
+        <item name="strokeColor">@color/divider</item>
+        <item name="strokeWidth">1dp</item>
         <item name="contentPadding">@dimen/card_padding</item>
     </style>
 
-    <!-- Chip样式 -->
+    <!-- ==================== Chip Style ==================== -->
     <style name="Chip" parent="Widget.MaterialComponents.Chip.Choice">
         <item name="chipBackgroundColor">@color/bg_surface_variant</item>
-        <item name="chipStrokeColor">@color/outline_variant</item>
-        <item name="chipStrokeWidth">0.5dp</item>
+        <item name="chipStrokeColor">@color/divider</item>
+        <item name="chipStrokeWidth">1dp</item>
         <item name="chipCornerRadius">@dimen/radius_full</item>
         <item name="android:textColor">@color/text_secondary</item>
         <item name="android:textSize">13sp</item>
@@ -109,7 +142,7 @@
         <item name="checkedIconVisible">false</item>
     </style>
 
-    <!-- 输入框样式 -->
+    <!-- ==================== Input Style ==================== -->
     <style name="Input" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxCornerRadiusTopStart">@dimen/radius_sm</item>
         <item name="boxCornerRadiusTopEnd">@dimen/radius_sm</item>
@@ -117,6 +150,6 @@
         <item name="boxCornerRadiusBottomEnd">@dimen/radius_sm</item>
         <item name="boxStrokeColor">@color/outline</item>
         <item name="boxBackgroundColor">@color/bg_surface</item>
-        <item name="hintTextColor">@color/accent</item>
+        <item name="hintTextColor">@color/primary</item>
     </style>
 </resources>

@@ -21,6 +21,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.chip.Chip;
+import com.example.barcodeoffline.ScanPreferences;
 import com.google.android.material.chip.ChipGroup;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
@@ -204,10 +205,12 @@ public class GenerateActivity extends AppCompatActivity {
     private Bitmap createBarcode(String value, BarcodeFormat format, int width, int height) throws WriterException {
         BitMatrix matrix = new MultiFormatWriter().encode(value, format, width, height);
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        int fgColor = ScanPreferences.getQrForegroundColor(this);
+        int bgColor = ScanPreferences.getQrBackgroundColor(this);
         int[] pixels = new int[width * height];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                pixels[y * width + x] = matrix.get(x, y) ? Color.BLACK : Color.WHITE;
+                pixels[y * width + x] = matrix.get(x, y) ? fgColor : bgColor;
             }
         }
         bitmap.setPixels(pixels, 0, width, 0, 0, width, height);

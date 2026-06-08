@@ -51,7 +51,7 @@ public class HistoryActivity extends AppCompatActivity {
     private int currentFilter = -1; // -1=全部, 0=扫描, 1=生成
 
     private static final String[][] FILTER_OPTIONS = {
-            {"全部", "-1"}, {"扫描", "0"}, {"生成", "1"}
+            {"全部", "-1"}, {"扫描", "0"}, {"生成", "1"}, {"收藏", "2"}
     };
 
     @Override
@@ -66,6 +66,11 @@ public class HistoryActivity extends AppCompatActivity {
         emptyView = findViewById(R.id.empty_view);
         btnCount = findViewById(R.id.btn_count);
         filterChips = findViewById(R.id.filter_chips);
+
+        // Handle favorites shortcut from main page
+        if (getIntent().getBooleanExtra("showFavorites", false)) {
+            currentFilter = 2;
+        }
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, displayItems);
         listView.setAdapter(adapter);
@@ -176,6 +181,8 @@ public class HistoryActivity extends AppCompatActivity {
             currentRecords = db.queryByMode(ScanDbHelper.MODE_SCAN);
         } else if (currentFilter == 1) {
             currentRecords = db.queryByMode(ScanDbHelper.MODE_GENERATE);
+        } else if (currentFilter == 2) {
+            currentRecords = db.queryFavorites();
         } else {
             currentRecords = db.queryRecent(500);
         }
@@ -191,11 +198,16 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     private void showRecordActions(ScanDbHelper.Record record) {
+        String favLabel = record.isFavorite ? "取消收藏" : "收藏";
         new AlertDialog.Builder(this)
                 .setTitle("条码详情")
                 .setMessage(record.content)
-                .setNeutralButton("复制", (d, w) -> copyText(record.content))
-                .setPositiveButton("关闭", null)
+                .setNeutralButton(favLabel, (d, w) -> {
+                    db.toggleFavorite(record.id);
+                    loadRecords();
+                    toast(record.isFavorite ? "已取消收藏" : "已收藏");
+                })
+                .setPositiveButton("复制", (d, w) -> copyText(record.content))
                 .setNegativeButton("生成条码", (d, w) -> {
                     startActivity(new Intent(this, GenerateActivity.class).putExtra("initValue", record.content));
                 })

@@ -59,6 +59,7 @@ public class ScanActivity extends AppCompatActivity {
     private int batchIndex = 0;
     private final List<ScanDbHelper.Record> batchRecords = new ArrayList<>();
     private final List<String> selectedFormats = new ArrayList<>();
+    private boolean autoScanMode = false;
 
     private ScanDbHelper db;
     private ScanResultParser.ParsedResult lastParsed;
@@ -99,6 +100,8 @@ public class ScanActivity extends AppCompatActivity {
         initViews();
         initFormatChips();
         updateBatchUI();
+
+        autoScanMode = ScanPreferences.getAutoScanEnabled(this);
 
         // 扫码 launcher
         scanLauncher = registerForActivityResult(new ScanContract(), result -> {
@@ -155,6 +158,15 @@ public class ScanActivity extends AppCompatActivity {
             }
         });
         findViewById(R.id.btn_export_batch).setOnClickListener(v -> exportBatch());
+
+        View autoScanIndicator = findViewById(R.id.auto_scan_indicator);
+        if (autoScanIndicator != null) {
+            autoScanIndicator.setOnClickListener(v -> {
+                autoScanMode = false;
+                autoScanIndicator.setVisibility(View.GONE);
+                toast("已停止连续扫码");
+            });
+        }
     }
 
     private void initFormatChips() {
@@ -422,6 +434,12 @@ public class ScanActivity extends AppCompatActivity {
     }
 
     private void onScanResult(String content, String formatName) {
+        String prefix = ScanPreferences.getCustomPrefix(this);
+        String suffix = ScanPreferences.getCustomSuffix(this);
+        if (!prefix.isEmpty() || !suffix.isEmpty()) {
+            content = prefix + content + suffix;
+        }
+
         vibrateOnce();
         lastParsed = ScanResultParser.parse(content);
         String safeFormatName = formatName == null || formatName.trim().isEmpty() ? "UNKNOWN" : formatName;
@@ -439,6 +457,11 @@ public class ScanActivity extends AppCompatActivity {
             btnScan.postDelayed(this::startScan, 350);
         } else {
             showSingleResult(lastParsed, safeFormatName);
+            if (autoScanMode) {
+                View autoScanIndicator = findViewById(R.id.auto_scan_indicator);
+                if (autoScanIndicator != null) autoScanIndicator.setVisibility(View.VISIBLE);
+                btnScan.postDelayed(this::startScan, 500);
+            }
         }
     }
 
@@ -588,6 +611,7 @@ public class ScanActivity extends AppCompatActivity {
     }
 
     private void vibrateOnce() {
+        if (!ScanPreferences.getVibrationEnabled(this)) return;
         try {
             Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
             if (vibrator == null) return;

@@ -15,55 +15,62 @@
         android:paddingTop="@dimen/space_xxl"
         android:paddingBottom="@dimen/space_xl">
 
-        <!-- ========== 头部 ========== -->
+        <!-- ========== Header ========== -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingBottom="@dimen/space_xxl">
+            android:paddingBottom="@dimen/space_xl">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="条码工具"
-                    android:textSize="30sp"
+                    android:textSize="28sp"
                     android:textColor="@color/text_primary"
                     android:fontFamily="sans-serif-medium" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="离线扫码 · 多格式生成 · 批量采集"
                     android:textSize="13sp"
                     android:textColor="@color/text_hint"
-                    android:paddingTop="2dp" />
+                    android:paddingTop="4dp" />
             </LinearLayout>
 
             <androidx.cardview.widget.CardView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                app:cardCornerRadius="@dimen/radius_xl"
+                android:id="@+id/btn_settings"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                app:cardCornerRadius="@dimen/radius_full"
                 app:cardElevation="@dimen/elevation_none"
-                app:cardBackgroundColor="@color/primary_container">
+                app:cardBackgroundColor="@color/bg_surface"
+                android:foreground="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_scan"
-                    android:contentDescription="app icon" />
+                    android:src="@drawable/ic_settings"
+                    android:tint="@color/text_secondary"
+                    android:contentDescription="settings" />
             </androidx.cardview.widget.CardView>
         </LinearLayout>
 
-        <!-- ========== 统计面板 ========== -->
+        <!-- ========== Stats Panel ========== -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="@dimen/radius_lg"
+            app:cardCornerRadius="@dimen/radius_md"
             app:cardElevation="@dimen/elevation_low"
             app:cardBackgroundColor="@color/bg_surface"
             android:layout_marginBottom="@dimen/space_lg">
@@ -74,7 +81,7 @@
                 android:orientation="vertical"
                 android:padding="@dimen/card_padding">
 
-                <!-- 统计标题行 -->
+                <!-- Stats header -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -85,6 +92,7 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:src="@drawable/ic_stats"
+                        android:tint="@color/text_hint"
                         android:contentDescription="stats" />
                     <TextView
                         android:layout_width="wrap_content"
@@ -95,27 +103,33 @@
                         android:paddingStart="6dp" />
                 </LinearLayout>
 
-                <!-- 三个统计数字 -->
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider"
+                    android:layout_marginBottom="@dimen/space_md" />
+
+                <!-- Three stats -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <!-- 今日 -->
+                    <!-- Today -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical"
                         android:gravity="center"
-                        android:background="@drawable/bg_card_static"
-                        android:padding="@dimen/space_md">
+                        android:padding="@dimen/space_sm">
                         <TextView
                             android:id="@+id/stat_today"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textSize="32sp"
+                            android:textSize="30sp"
                             android:textColor="@color/accent"
                             android:fontFamily="sans-serif-medium" />
                         <TextView
@@ -128,24 +142,24 @@
                     </LinearLayout>
 
                     <View
-                        android:layout_width="@dimen/space_sm"
-                        android:layout_height="1dp" />
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/divider" />
 
-                    <!-- 总计 -->
+                    <!-- Total -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical"
                         android:gravity="center"
-                        android:background="@drawable/bg_card_static"
-                        android:padding="@dimen/space_md">
+                        android:padding="@dimen/space_sm">
                         <TextView
                             android:id="@+id/stat_total"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textSize="32sp"
+                            android:textSize="30sp"
                             android:textColor="@color/primary"
                             android:fontFamily="sans-serif-medium" />
                         <TextView
@@ -158,24 +172,24 @@
                     </LinearLayout>
 
                     <View
-                        android:layout_width="@dimen/space_sm"
-                        android:layout_height="1dp" />
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/divider" />
 
-                    <!-- 去重 -->
+                    <!-- Unique -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical"
                         android:gravity="center"
-                        android:background="@drawable/bg_card_static"
-                        android:padding="@dimen/space_md">
+                        android:padding="@dimen/space_sm">
                         <TextView
                             android:id="@+id/stat_unique"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textSize="32sp"
+                            android:textSize="30sp"
                             android:textColor="@color/badge_batch"
                             android:fontFamily="sans-serif-medium" />
                         <TextView
@@ -190,281 +204,365 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- ========== 功能卡片: 扫码识别 ========== -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_scan"
+        <!-- ========== Section title ========== -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="功能"
+            android:textSize="15sp"
+            android:textColor="@color/text_secondary"
+            android:fontFamily="sans-serif-medium"
+            android:paddingBottom="@dimen/space_md" />
+
+        <!-- ========== Feature Grid (2-column) ========== -->
+
+        <!-- Row 1: Scan + Generate -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="@dimen/radius_md"
-            app:cardElevation="@dimen/elevation_low"
-            app:cardBackgroundColor="@color/bg_surface"
-            android:layout_marginBottom="@dimen/space_sm"
-            android:foreground="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true">
-            <LinearLayout
-                android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/space_sm">
+
+            <!-- Card: 扫码识别 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_scan"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="@dimen/card_padding">
-                <ImageView
-                    android:layout_width="@dimen/icon_md"
-                    android:layout_height="@dimen/icon_md"
-                    android:src="@drawable/ic_scan"
-                    android:contentDescription="scan" />
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                app:cardCornerRadius="@dimen/radius_md"
+                app:cardElevation="@dimen/elevation_low"
+                app:cardBackgroundColor="@color/bg_surface"
+                android:foreground="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:paddingHorizontal="@dimen/space_md">
+                    android:padding="@dimen/card_padding">
+
+                    <!-- Icon circle -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        app:cardCornerRadius="@dimen/radius_full"
+                        app:cardElevation="@dimen/elevation_none"
+                        app:cardBackgroundColor="@color/success_container"
+                        android:layout_marginBottom="@dimen/space_md">
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_scan"
+                            android:tint="@color/badge_scan"
+                            android:contentDescription="scan" />
+                    </androidx.cardview.widget.CardView>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="扫码识别"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textColor="@color/text_primary"
                         android:fontFamily="sans-serif-medium" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="14种条码格式 · 结构化解析"
+                        android:text="14种格式 · 结构化解析"
                         android:textSize="12sp"
                         android:textColor="@color/text_hint"
-                        android:paddingTop="2dp" />
+                        android:paddingTop="4dp" />
                 </LinearLayout>
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_back"
-                    android:rotation="180"
-                    android:alpha="0.3"
-                    android:contentDescription="go" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-        <!-- ========== 功能卡片: 输入生成 ========== -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_generate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="@dimen/radius_md"
-            app:cardElevation="@dimen/elevation_low"
-            app:cardBackgroundColor="@color/bg_surface"
-            android:layout_marginBottom="@dimen/space_sm"
-            android:foreground="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true">
-            <LinearLayout
-                android:layout_width="match_parent"
+            <!-- Card: 输入生成 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_generate"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="@dimen/card_padding">
-                <ImageView
-                    android:layout_width="@dimen/icon_md"
-                    android:layout_height="@dimen/icon_md"
-                    android:src="@drawable/ic_generate"
-                    android:contentDescription="generate" />
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                app:cardCornerRadius="@dimen/radius_md"
+                app:cardElevation="@dimen/elevation_low"
+                app:cardBackgroundColor="@color/bg_surface"
+                android:foreground="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:paddingHorizontal="@dimen/space_md">
+                    android:padding="@dimen/card_padding">
+
+                    <!-- Icon circle -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        app:cardCornerRadius="@dimen/radius_full"
+                        app:cardElevation="@dimen/elevation_none"
+                        app:cardBackgroundColor="@color/info_container"
+                        android:layout_marginBottom="@dimen/space_md">
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_generate"
+                            android:tint="@color/badge_generate"
+                            android:contentDescription="generate" />
+                    </androidx.cardview.widget.CardView>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="输入生成"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textColor="@color/text_primary"
                         android:fontFamily="sans-serif-medium" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="一维码 · 二维码 · 多格式输出"
+                        android:text="一维码 · 二维码 · 多格式"
                         android:textSize="12sp"
                         android:textColor="@color/text_hint"
-                        android:paddingTop="2dp" />
+                        android:paddingTop="4dp" />
                 </LinearLayout>
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_back"
-                    android:rotation="180"
-                    android:alpha="0.3"
-                    android:contentDescription="go" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
 
-        <!-- ========== 功能卡片: 批量扫描 ========== -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_batch"
+        <!-- Row 2: Batch + History -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="@dimen/radius_md"
-            app:cardElevation="@dimen/elevation_low"
-            app:cardBackgroundColor="@color/bg_surface"
-            android:layout_marginBottom="@dimen/space_sm"
-            android:foreground="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true">
-            <LinearLayout
-                android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/space_sm">
+
+            <!-- Card: 批量扫描 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_batch"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="@dimen/card_padding">
-                <ImageView
-                    android:layout_width="@dimen/icon_md"
-                    android:layout_height="@dimen/icon_md"
-                    android:src="@drawable/ic_batch"
-                    android:contentDescription="batch" />
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                app:cardCornerRadius="@dimen/radius_md"
+                app:cardElevation="@dimen/elevation_low"
+                app:cardBackgroundColor="@color/bg_surface"
+                android:foreground="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:paddingHorizontal="@dimen/space_md">
+                    android:padding="@dimen/card_padding">
+
+                    <!-- Icon circle -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        app:cardCornerRadius="@dimen/radius_full"
+                        app:cardElevation="@dimen/elevation_none"
+                        app:cardBackgroundColor="#EDE9FE"
+                        android:layout_marginBottom="@dimen/space_md">
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_batch"
+                            android:tint="@color/badge_batch"
+                            android:contentDescription="batch" />
+                    </androidx.cardview.widget.CardView>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="批量扫描"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textColor="@color/text_primary"
                         android:fontFamily="sans-serif-medium" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="连续扫码 · 实时计数 · CSV导出"
+                        android:text="连续扫码 · 实时计数"
                         android:textSize="12sp"
                         android:textColor="@color/text_hint"
-                        android:paddingTop="2dp" />
+                        android:paddingTop="4dp" />
                 </LinearLayout>
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_back"
-                    android:rotation="180"
-                    android:alpha="0.3"
-                    android:contentDescription="go" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-        <!-- ========== 功能卡片: 历史记录 ========== -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_history"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="@dimen/radius_md"
-            app:cardElevation="@dimen/elevation_low"
-            app:cardBackgroundColor="@color/bg_surface"
-            android:layout_marginBottom="@dimen/space_sm"
-            android:foreground="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true">
-            <LinearLayout
-                android:layout_width="match_parent"
+            <!-- Card: 历史记录 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_history"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="@dimen/card_padding">
-                <ImageView
-                    android:layout_width="@dimen/icon_md"
-                    android:layout_height="@dimen/icon_md"
-                    android:src="@drawable/ic_history"
-                    android:contentDescription="history" />
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                app:cardCornerRadius="@dimen/radius_md"
+                app:cardElevation="@dimen/elevation_low"
+                app:cardBackgroundColor="@color/bg_surface"
+                android:foreground="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:paddingHorizontal="@dimen/space_md">
+                    android:padding="@dimen/card_padding">
+
+                    <!-- Icon circle -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        app:cardCornerRadius="@dimen/radius_full"
+                        app:cardElevation="@dimen/elevation_none"
+                        app:cardBackgroundColor="@color/accent_container"
+                        android:layout_marginBottom="@dimen/space_md">
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_history"
+                            android:tint="@color/accent"
+                            android:contentDescription="history" />
+                    </androidx.cardview.widget.CardView>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="历史记录"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textColor="@color/text_primary"
                         android:fontFamily="sans-serif-medium" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="搜索 · 筛选 · 导出 CSV/JSON"
+                        android:text="搜索 · 筛选 · 导出"
                         android:textSize="12sp"
                         android:textColor="@color/text_hint"
-                        android:paddingTop="2dp" />
+                        android:paddingTop="4dp" />
                 </LinearLayout>
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_back"
-                    android:rotation="180"
-                    android:alpha="0.3"
-                    android:contentDescription="go" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
 
-        <!-- ========== 功能卡片: 相册识别 ========== -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_gallery"
+        <!-- Row 3: Gallery + Favorites -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="@dimen/radius_md"
-            app:cardElevation="@dimen/elevation_low"
-            app:cardBackgroundColor="@color/bg_surface"
-            android:layout_marginBottom="@dimen/space_lg"
-            android:foreground="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true">
-            <LinearLayout
-                android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/space_lg">
+
+            <!-- Card: 相册识别 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_gallery"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="@dimen/card_padding">
-                <ImageView
-                    android:layout_width="@dimen/icon_md"
-                    android:layout_height="@dimen/icon_md"
-                    android:src="@drawable/ic_gallery"
-                    android:contentDescription="gallery" />
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                app:cardCornerRadius="@dimen/radius_md"
+                app:cardElevation="@dimen/elevation_low"
+                app:cardBackgroundColor="@color/bg_surface"
+                android:foreground="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:paddingHorizontal="@dimen/space_md">
+                    android:padding="@dimen/card_padding">
+
+                    <!-- Icon circle -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        app:cardCornerRadius="@dimen/radius_full"
+                        app:cardElevation="@dimen/elevation_none"
+                        app:cardBackgroundColor="#CCFBF1"
+                        android:layout_marginBottom="@dimen/space_md">
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_gallery"
+                            android:tint="#14B8A6"
+                            android:contentDescription="gallery" />
+                    </androidx.cardview.widget.CardView>
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="相册识别"
-                        android:textSize="16sp"
+                        android:textSize="15sp"
                         android:textColor="@color/text_primary"
                         android:fontFamily="sans-serif-medium" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="从图片中识别条码 · 离线解析"
+                        android:text="图片识别 · 离线解析"
                         android:textSize="12sp"
                         android:textColor="@color/text_hint"
-                        android:paddingTop="2dp" />
+                        android:paddingTop="4dp" />
                 </LinearLayout>
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_back"
-                    android:rotation="180"
-                    android:alpha="0.3"
-                    android:contentDescription="go" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
-        <!-- ========== 底部版本信息 ========== -->
+            <!-- Card: 收藏夹 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_favorites"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                app:cardCornerRadius="@dimen/radius_md"
+                app:cardElevation="@dimen/elevation_low"
+                app:cardBackgroundColor="@color/bg_surface"
+                android:foreground="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/card_padding">
+
+                    <!-- Icon circle -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        app:cardCornerRadius="@dimen/radius_full"
+                        app:cardElevation="@dimen/elevation_none"
+                        app:cardBackgroundColor="@color/accent_container"
+                        android:layout_marginBottom="@dimen/space_md">
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_star_filled"
+                            android:tint="@color/accent"
+                            android:contentDescription="favorites" />
+                    </androidx.cardview.widget.CardView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="收藏夹"
+                        android:textSize="15sp"
+                        android:textColor="@color/text_primary"
+                        android:fontFamily="sans-serif-medium" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="常用条码 · 快速访问"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_hint"
+                        android:paddingTop="4dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+        <!-- ========== Footer ========== -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="v2.0 · 暖色护眼 · 全程离线"
+            android:text="v2.1 · 全程离线 · 隐私安全"
             android:textSize="11sp"
             android:textColor="@color/text_hint"
             android:gravity="center"

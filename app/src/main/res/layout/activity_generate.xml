@@ -15,6 +15,7 @@
         android:paddingHorizontal="@dimen/space_lg"
         android:background="@color/bg_surface"
         android:elevation="@dimen/elevation_low">
+
         <ImageView
             android:id="@+id/btn_back"
             android:layout_width="40dp"
@@ -24,7 +25,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:contentDescription="back" />
+            android:contentDescription="@string/back" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -35,12 +37,14 @@
             android:paddingStart="@dimen/space_sm" />
     </LinearLayout>
 
+    <!-- 可滚动内容区 -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:fillViewport="true"
-        android:overScrollMode="never">
+        android:overScrollMode="never"
+        android:clipToPadding="false">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -48,7 +52,7 @@
             android:orientation="vertical"
             android:padding="@dimen/space_lg">
 
-            <!-- 输入框 -->
+            <!-- 输入卡片 -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -56,6 +60,7 @@
                 app:cardElevation="@dimen/elevation_low"
                 app:cardBackgroundColor="@color/bg_surface"
                 android:layout_marginBottom="@dimen/space_lg">
+
                 <EditText
                     android:id="@+id/input_text"
                     android:layout_width="match_parent"
@@ -72,16 +77,17 @@
                     android:inputType="textMultiLine" />
             </androidx.cardview.widget.CardView>
 
-            <!-- 格式选择标题 -->
+            <!-- 条码格式标签 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="条码格式"
                 android:textSize="13sp"
                 android:textColor="@color/text_hint"
+                android:fontFamily="sans-serif-medium"
                 android:paddingBottom="@dimen/space_sm" />
 
-            <!-- 格式选择 chips -->
+            <!-- 格式选择 ChipGroup -->
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/format_group"
                 android:layout_width="match_parent"
@@ -99,6 +105,7 @@
                 app:cardElevation="@dimen/elevation_mid"
                 app:cardBackgroundColor="@color/bg_surface"
                 android:layout_marginBottom="@dimen/space_sm">
+
                 <ImageView
                     android:id="@+id/preview_image"
                     android:layout_width="match_parent"
@@ -106,7 +113,7 @@
                     android:scaleType="fitCenter"
                     android:padding="@dimen/space_lg"
                     android:background="@color/white"
-                    android:contentDescription="preview" />
+                    android:contentDescription="条码预览" />
             </androidx.cardview.widget.CardView>
 
             <!-- 信息标签 -->
@@ -122,7 +129,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- 底部按钮 -->
+    <!-- 底部按钮区域 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -130,6 +137,8 @@
         android:padding="@dimen/space_lg"
         android:background="@color/bg_surface"
         android:elevation="@dimen/elevation_high">
+
+        <!-- 生成预览按钮 -->
         <TextView
             android:id="@+id/btn_generate"
             android:layout_width="match_parent"
@@ -142,11 +151,14 @@
             android:fontFamily="sans-serif-medium"
             android:clickable="true"
             android:focusable="true" />
+
+        <!-- 保存 / 分享按钮行 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingTop="@dimen/space_sm">
+
             <TextView
                 android:id="@+id/btn_save"
                 android:layout_width="0dp"
@@ -160,6 +172,7 @@
                 android:layout_marginEnd="6dp"
                 android:clickable="true"
                 android:focusable="true" />
+
             <TextView
                 android:id="@+id/btn_share"
                 android:layout_width="0dp"

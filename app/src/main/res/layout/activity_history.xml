@@ -15,6 +15,7 @@
         android:paddingHorizontal="@dimen/space_lg"
         android:background="@color/bg_surface"
         android:elevation="@dimen/elevation_low">
+
         <ImageView
             android:id="@+id/btn_back"
             android:layout_width="40dp"
@@ -24,7 +25,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:contentDescription="back" />
+            android:contentDescription="@string/back" />
+
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -34,6 +36,7 @@
             android:textColor="@color/text_primary"
             android:fontFamily="sans-serif-medium"
             android:paddingStart="@dimen/space_sm" />
+
         <ImageView
             android:id="@+id/btn_export"
             android:layout_width="40dp"
@@ -43,7 +46,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:contentDescription="export" />
+            android:contentDescription="导出" />
     </LinearLayout>
 
     <!-- 搜索栏 -->
@@ -55,12 +58,15 @@
         android:paddingVertical="@dimen/space_sm"
         android:background="@color/bg_surface"
         android:gravity="center_vertical">
+
         <ImageView
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/ic_search"
             android:layout_marginEnd="8dp"
-            android:contentDescription="search" />
+            android:alpha="0.5"
+            android:contentDescription="搜索" />
+
         <EditText
             android:id="@+id/search_input"
             android:layout_width="0dp"
@@ -77,7 +83,7 @@
             android:imeOptions="actionSearch" />
     </LinearLayout>
 
-    <!-- 筛选chips -->
+    <!-- 筛选 ChipGroup -->
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -85,6 +91,7 @@
         android:paddingHorizontal="@dimen/space_lg"
         android:paddingVertical="@dimen/space_xs"
         android:background="@color/bg_surface">
+
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/filter_chips"
             android:layout_width="wrap_content"
@@ -94,62 +101,72 @@
             app:chipSpacing="6dp" />
     </HorizontalScrollView>
 
+    <!-- 分割线 -->
     <View
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:background="@color/divider" />
 
-    <!-- 列表 -->
-    <ListView
-        android:id="@+id/history_list"
+    <!-- 列表区域（带空状态叠加） -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:padding="@dimen/space_sm"
-        android:clipToPadding="false"
-        android:overScrollMode="never" />
+        android:layout_weight="1">
 
-    <!-- 空状态 -->
-    <LinearLayout
-        android:id="@+id/empty_view"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
-        <androidx.cardview.widget.CardView
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            app:cardCornerRadius="@dimen/radius_xl"
-            app:cardElevation="@dimen/elevation_none"
-            app:cardBackgroundColor="@color/bg_surface_variant"
-            android:layout_marginBottom="@dimen/space_md">
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_history"
-                android:alpha="0.4"
-                android:contentDescription="empty" />
-        </androidx.cardview.widget.CardView>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="暂无记录"
-            android:textSize="15sp"
-            android:textColor="@color/text_hint" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="扫码或生成条码后会自动记录"
-            android:textSize="12sp"
-            android:textColor="@color/text_hint"
-            android:alpha="0.6"
-            android:paddingTop="4dp" />
-    </LinearLayout>
+        <!-- 历史列表 -->
+        <ListView
+            android:id="@+id/history_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
+            android:padding="@dimen/space_sm"
+            android:clipToPadding="false"
+            android:overScrollMode="never" />
+
+        <!-- 空状态视图 -->
+        <LinearLayout
+            android:id="@+id/empty_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                app:cardCornerRadius="@dimen/radius_xl"
+                app:cardElevation="@dimen/elevation_none"
+                app:cardBackgroundColor="@color/bg_surface_variant"
+                android:layout_marginBottom="@dimen/space_md">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_history"
+                    android:alpha="0.4"
+                    android:contentDescription="暂无记录" />
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="暂无记录"
+                android:textSize="15sp"
+                android:textColor="@color/text_hint" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="扫码或生成条码后会自动记录"
+                android:textSize="12sp"
+                android:textColor="@color/text_hint"
+                android:alpha="0.6"
+                android:paddingTop="4dp" />
+        </LinearLayout>
+    </FrameLayout>
 
     <!-- 底部操作栏 -->
     <LinearLayout
@@ -160,17 +177,16 @@
         android:background="@color/bg_surface"
         android:elevation="@dimen/elevation_high"
         android:gravity="center_vertical">
+
         <TextView
             android:id="@+id/btn_count"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="共 0 条"
             android:textSize="13sp"
             android:textColor="@color/text_hint" />
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+
         <TextView
             android:id="@+id/btn_clear"
             android:layout_width="wrap_content"
