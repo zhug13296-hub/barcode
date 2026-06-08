@@ -469,8 +469,8 @@ public class ScanActivity extends AppCompatActivity {
         emptyHint.setVisibility(View.GONE);
         resultCard.setVisibility(View.VISIBLE);
 
-        resultTypeBadge.setText(parsed.displayType);
-        resultFormat.setText(formatName);
+        resultTypeBadge.setText(formatName);
+        resultFormat.setText("");
         resultContent.setText(lastParsed.rawValue);
     }
 
@@ -500,7 +500,7 @@ public class ScanActivity extends AppCompatActivity {
 
         TextView typeLabel = new TextView(this);
         String fmtDisplay = record.format != null ? record.format.replace("_", " ") : "";
-        typeLabel.setText(" " + parsed.displayType + " · " + fmtDisplay);
+        typeLabel.setText(" " + fmtDisplay);
         typeLabel.setTextSize(12);
         typeLabel.setTextColor(ContextCompat.getColor(this, R.color.text_hint));
         row.addView(typeLabel);
@@ -549,14 +549,9 @@ public class ScanActivity extends AppCompatActivity {
         }
         StringBuilder csv = new StringBuilder();
         csv.append("\uFEFF"); // UTF-8 BOM for Excel compatibility
-        csv.append("序号,类型,格式,内容,时间\n");
+        csv.append("条码内容\n");
         for (ScanDbHelper.Record r : batchRecords) {
-            csv.append(r.batchIndex).append(",");
-            csv.append(ScanResultParser.parse(r.content).displayType).append(",");
-            csv.append(escapeCsv(r.format)).append(",");
-            csv.append(escapeCsv(r.content)).append(",");
-            csv.append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.CHINA)
-                    .format(new java.util.Date(r.timestamp))).append("\n");
+            csv.append(escapeCsv(r.content)).append("\n");
         }
         shareText(csv.toString(), "batch_scan_" + System.currentTimeMillis() + ".csv", "text/csv");
     }

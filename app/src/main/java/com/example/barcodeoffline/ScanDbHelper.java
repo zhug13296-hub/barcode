@@ -232,17 +232,10 @@ public class ScanDbHelper extends SQLiteOpenHelper {
     public String exportCsv() {
         StringBuilder sb = new StringBuilder();
         sb.append("\uFEFF"); // UTF-8 BOM for Excel compatibility
-        sb.append("ID,类型,格式,内容,时间,批量序号,收藏\n");
+        sb.append("条码内容\n");
         List<Record> records = query("SELECT * FROM " + TABLE + " ORDER BY timestamp DESC", null);
         for (Record r : records) {
-            sb.append(r.id).append(",");
-            sb.append(r.mode == MODE_SCAN ? "扫描" : "生成").append(",");
-            sb.append(escapeCsv(r.format)).append(",");
-            sb.append(escapeCsv(r.content)).append(",");
-            sb.append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.CHINA)
-                    .format(new java.util.Date(r.timestamp))).append(",");
-            sb.append(r.batchIndex).append(",");
-            sb.append(r.isFavorite ? "是" : "否").append("\n");
+            sb.append(escapeCsv(r.content)).append("\n");
         }
         return sb.toString();
     }
