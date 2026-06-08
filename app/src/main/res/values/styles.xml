@@ -39,26 +39,26 @@
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
-    <style name="Text.Subtitle">
+    <style name="Text.Subtitle" parent="TextAppearance.MaterialComponents.Subtitle1">
         <item name="android:textColor">@color/text_secondary</item>
         <item name="android:textSize">14sp</item>
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
-    <style name="Text.Body">
+    <style name="Text.Body" parent="TextAppearance.MaterialComponents.Body1">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">15sp</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:lineSpacingExtra">3dp</item>
     </style>
 
-    <style name="Text.Caption">
+    <style name="Text.Caption" parent="TextAppearance.MaterialComponents.Caption">
         <item name="android:textColor">@color/text_hint</item>
         <item name="android:textSize">12sp</item>
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
-    <style name="Text.Label">
+    <style name="Text.Label" parent="TextAppearance.MaterialComponents.Overline">
         <item name="android:textColor">@color/text_secondary</item>
         <item name="android:textSize">13sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
