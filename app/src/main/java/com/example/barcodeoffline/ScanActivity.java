@@ -29,6 +29,7 @@ import com.google.zxing.DecodeHintType;
 import com.google.zxing.MultiFormatReader;
 import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.Result;
+import com.google.zxing.common.GlobalHistogramBinarizer;
 import com.google.zxing.common.HybridBinarizer;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
@@ -249,11 +250,19 @@ public class ScanActivity extends ComponentActivity {
         } else {
             options.setDesiredBarcodeFormats(selectedFormats);
         }
-        scanLauncher.launch(options);
+        try {
+            scanLauncher.launch(options);
+        } catch (Exception e) {
+            toast("启动扫码失败: " + safeMessage(e));
+        }
     }
 
     private void openGallery() {
-        galleryLauncher.launch("image/*");
+        try {
+            galleryLauncher.launch("image/*");
+        } catch (Exception e) {
+            toast("打开相册失败: " + safeMessage(e));
+        }
     }
 
     /** 从图片URI解码条码 */
@@ -271,14 +280,6 @@ public class ScanActivity extends ComponentActivity {
                 return;
             }
 
-            int width = bitmap.getWidth();
-            int height = bitmap.getHeight();
-            int[] pixels = new int[width * height];
-            bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
-
-            RGBLuminanceSource source = new RGBLuminanceSource(width, height, pixels);
-            BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
-
             Map<DecodeHintType, Object> hints = new EnumMap<>(DecodeHintType.class);
             hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
             Collection<com.google.zxing.BarcodeFormat> selectedFmts = getSelectedFormats();
@@ -286,7 +287,7 @@ public class ScanActivity extends ComponentActivity {
                 hints.put(DecodeHintType.POSSIBLE_FORMATS, selectedFmts);
             }
 
-            Result result = new MultiFormatReader().decode(binaryBitmap, hints);
+            Result result = decodeBitmap(bitmap, hints);
             if (result != null) {
                 onScanResult(result.getText(), result.getBarcodeFormat().name());
             } else {
@@ -295,8 +296,74 @@ public class ScanActivity extends ComponentActivity {
         } catch (com.google.zxing.NotFoundException e) {
             toast("图片中未找到条码");
         } catch (Exception e) {
-            toast("识别失败: " + e.getMessage());
+            toast("识别失败: " + safeMessage(e));
         }
+    }
+
+    private Result decodeBitmap(Bitmap bitmap, Map<DecodeHintType, Object> hints) {
+        Result result = tryDecodeBitmap(bitmap, hints);
+        if (result != null) return result;
+
+        Bitmap scaled = scaleBitmapForDecode(bitmap);
+        if (scaled != bitmap) {
+            try {
+                result = tryDecodeBitmap(scaled, hints);
+                if (result != null) return result;
+            } finally {
+                scaled.recycle();
+            }
+        }
+        return null;
+    }
+
+    private Result tryDecodeBitmap(Bitmap bitmap, Map<DecodeHintType, Object> hints) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int[] pixels = new int[width * height];
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        Result result = tryDecodePixels(width, height, pixels, hints);
+        if (result != null) return result;
+
+        int[] inverted = invertPixels(pixels);
+        return tryDecodePixels(width, height, inverted, hints);
+    }
+
+    private Result tryDecodePixels(int width, int height, int[] pixels, Map<DecodeHintType, Object> hints) {
+        RGBLuminanceSource source = new RGBLuminanceSource(width, height, pixels);
+        Result result = decodeSource(source, hints, true);
+        return result != null ? result : decodeSource(source, hints, false);
+    }
+
+    private Result decodeSource(RGBLuminanceSource source, Map<DecodeHintType, Object> hints, boolean hybrid) {
+        MultiFormatReader reader = new MultiFormatReader();
+        try {
+            BinaryBitmap binaryBitmap = new BinaryBitmap(
+                    hybrid ? new HybridBinarizer(source) : new GlobalHistogramBinarizer(source));
+            return reader.decode(binaryBitmap, hints);
+        } catch (Exception ignored) {
+            return null;
+        } finally {
+            reader.reset();
+        }
+    }
+
+    private Bitmap scaleBitmapForDecode(Bitmap bitmap) {
+        int maxSide = Math.max(bitmap.getWidth(), bitmap.getHeight());
+        if (maxSide <= 1600) return bitmap;
+
+        float scale = 1600f / maxSide;
+        int width = Math.max(1, Math.round(bitmap.getWidth() * scale));
+        int height = Math.max(1, Math.round(bitmap.getHeight() * scale));
+        return Bitmap.createScaledBitmap(bitmap, width, height, true);
+    }
+
+    private int[] invertPixels(int[] pixels) {
+        int[] inverted = new int[pixels.length];
+        for (int i = 0; i < pixels.length; i++) {
+            inverted[i] = (pixels[i] & 0xFF000000) | (~pixels[i] & 0x00FFFFFF);
+        }
+        return inverted;
     }
 
     private Collection<com.google.zxing.BarcodeFormat> getSelectedFormats() {
@@ -317,9 +384,10 @@ public class ScanActivity extends ComponentActivity {
     private void onScanResult(String content, String formatName) {
         vibrateOnce();
         lastParsed = ScanResultParser.parse(content);
+        String safeFormatName = formatName == null || formatName.trim().isEmpty() ? "UNKNOWN" : formatName;
 
         ScanDbHelper.Record record = new ScanDbHelper.Record(
-                ScanDbHelper.MODE_SCAN, formatName, content,
+                ScanDbHelper.MODE_SCAN, safeFormatName, content,
                 batchMode ? ++batchIndex : 0);
         db.insert(record);
 
@@ -328,9 +396,9 @@ public class ScanActivity extends ComponentActivity {
             batchRecords.add(record);
             batchCountView.setText("已扫: " + batchCount);
             addBatchResultItem(record, lastParsed);
-            startScan();
+            btnScan.postDelayed(this::startScan, 350);
         } else {
-            showSingleResult(lastParsed, formatName);
+            showSingleResult(lastParsed, safeFormatName);
         }
     }
 
@@ -492,6 +560,13 @@ public class ScanActivity extends ComponentActivity {
 
     private void toast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    private String safeMessage(Exception e) {
+        String message = e.getMessage();
+        return message == null || message.trim().isEmpty()
+                ? e.getClass().getSimpleName()
+                : message;
     }
 
     private int dp(int value) {
