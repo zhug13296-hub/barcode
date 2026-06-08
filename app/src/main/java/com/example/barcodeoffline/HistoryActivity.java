@@ -191,19 +191,11 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     private void showRecordActions(ScanDbHelper.Record record) {
-        ScanResultParser.ParsedResult parsed = ScanResultParser.parse(record.content);
         new AlertDialog.Builder(this)
-                .setTitle(parsed.displayType)
+                .setTitle("条码详情")
                 .setMessage(record.content)
                 .setNeutralButton("复制", (d, w) -> copyText(record.content))
-                .setPositiveButton(parsed.actionLabel, (d, w) -> {
-                    Intent intent = ScanResultParser.createActionIntent(this, parsed);
-                    if (intent != null) {
-                        try { startActivity(intent); } catch (Exception e) { copyText(record.content); }
-                    } else {
-                        copyText(record.content);
-                    }
-                })
+                .setPositiveButton("关闭", null)
                 .setNegativeButton("生成条码", (d, w) -> {
                     startActivity(new Intent(this, GenerateActivity.class).putExtra("initValue", record.content));
                 })

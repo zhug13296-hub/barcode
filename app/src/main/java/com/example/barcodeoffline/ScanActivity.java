@@ -150,12 +150,8 @@ public class ScanActivity extends AppCompatActivity {
         });
         btnAction1.setOnClickListener(v -> {
             if (lastParsed != null) {
-                Intent intent = ScanResultParser.createActionIntent(this, lastParsed);
-                if (intent != null) {
-                    try { startActivity(intent); } catch (Exception e) { copyText(lastParsed.rawValue); }
-                } else {
-                    copyText(lastParsed.rawValue);
-                }
+                startActivity(new Intent(this, GenerateActivity.class)
+                    .putExtra("initValue", lastParsed.rawValue));
             }
         });
         findViewById(R.id.btn_export_batch).setOnClickListener(v -> exportBatch());
@@ -452,8 +448,7 @@ public class ScanActivity extends AppCompatActivity {
 
         resultTypeBadge.setText(parsed.displayType);
         resultFormat.setText(formatName);
-        resultContent.setText(parsed.friendlyValue);
-        btnAction1.setText(parsed.actionLabel);
+        resultContent.setText(lastParsed.rawValue);
     }
 
     private void addBatchResultItem(ScanDbHelper.Record record, ScanResultParser.ParsedResult parsed) {
@@ -481,7 +476,8 @@ public class ScanActivity extends AppCompatActivity {
         row.addView(badge);
 
         TextView typeLabel = new TextView(this);
-        typeLabel.setText(" " + parsed.displayType + " · " + record.format);
+        String fmtDisplay = record.format != null ? record.format.replace("_", " ") : "";
+        typeLabel.setText(" " + parsed.displayType + " · " + fmtDisplay);
         typeLabel.setTextSize(12);
         typeLabel.setTextColor(ContextCompat.getColor(this, R.color.text_hint));
         row.addView(typeLabel);
@@ -489,8 +485,10 @@ public class ScanActivity extends AppCompatActivity {
         item.addView(row);
 
         TextView content = new TextView(this);
-        content.setText(parsed.friendlyValue);
+        content.setText(record.content);
         content.setTextSize(15);
+        content.setMaxLines(2);
+        content.setEllipsize(android.text.TextUtils.TruncateAt.END);
         content.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
         content.setPadding(0, dp(4), 0, 0);
         content.setMaxLines(3);
