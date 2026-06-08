@@ -22,7 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.ComponentActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
@@ -51,7 +51,7 @@ import java.util.concurrent.Executors;
 /**
  * 扫码页面 — 单次/批量模式、闪光灯、格式选择、结构化结果、相册识别
  */
-public class ScanActivity extends ComponentActivity {
+public class ScanActivity extends AppCompatActivity {
 
     private boolean batchMode = false;
     private boolean flashOn = false;

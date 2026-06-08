@@ -1,6 +1,5 @@
 package com.example.barcodeoffline;
 
-import android.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -20,7 +19,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.ComponentActivity;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * 历史记录 — Material Chip筛选、搜索、导出
  */
-public class HistoryActivity extends ComponentActivity {
+public class HistoryActivity extends AppCompatActivity {
 
     private ScanDbHelper db;
     private List<ScanDbHelper.Record> currentRecords = new ArrayList<>();

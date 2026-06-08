@@ -4,12 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import androidx.activity.ComponentActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * 首页 — 卡片式导航 + 统计面板
  */
-public class MainActivity extends ComponentActivity {
+public class MainActivity extends AppCompatActivity {
 
     private TextView statToday, statTotal, statUnique;
     private ScanDbHelper db;

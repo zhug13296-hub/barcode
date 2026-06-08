@@ -18,7 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.ComponentActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -39,7 +39,7 @@ import java.util.concurrent.Executors;
 /**
  * 生成页面 — Material Chip格式选择、多格式条码生成
  */
-public class GenerateActivity extends ComponentActivity {
+public class GenerateActivity extends AppCompatActivity {
 
     private EditText inputText;
     private ImageView previewImage;
