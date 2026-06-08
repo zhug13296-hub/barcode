@@ -231,6 +231,7 @@ public class ScanDbHelper extends SQLiteOpenHelper {
     /** 导出全部记录为CSV格式 */
     public String exportCsv() {
         StringBuilder sb = new StringBuilder();
+        sb.append("\uFEFF"); // UTF-8 BOM for Excel compatibility
         sb.append("ID,类型,格式,内容,时间,批量序号,收藏\n");
         List<Record> records = query("SELECT * FROM " + TABLE + " ORDER BY timestamp DESC", null);
         for (Record r : records) {

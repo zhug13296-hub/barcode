@@ -548,6 +548,7 @@ public class ScanActivity extends AppCompatActivity {
             return;
         }
         StringBuilder csv = new StringBuilder();
+        csv.append("\uFEFF"); // UTF-8 BOM for Excel compatibility
         csv.append("序号,类型,格式,内容,时间\n");
         for (ScanDbHelper.Record r : batchRecords) {
             csv.append(r.batchIndex).append(",");
