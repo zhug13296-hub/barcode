@@ -15,6 +15,7 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -491,8 +492,4 @@ public class ScanActivity extends ComponentActivity {
         return (int) (value * getResources().getDisplayMetrics().density + 0.5f);
     }
 
-    // ImageView helper class
-    private static class ImageView extends androidx.appcompat.widget.AppCompatImageView {
-        public ImageView(android.content.Context ctx) { super(ctx); }
-    }
 }

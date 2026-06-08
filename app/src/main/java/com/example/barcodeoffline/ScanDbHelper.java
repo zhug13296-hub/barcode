@@ -131,7 +131,7 @@ public class ScanDbHelper extends SQLiteOpenHelper {
 
     /** 统计今日扫描数 */
     public int countToday() {
-        long todayStart = System.currentTimeMillis() - (System.currentTimeMillis() % (24 * 60 * 60 * 100L));
+        long todayStart = System.currentTimeMillis() - (System.currentTimeMillis() % 86400000L);
         Cursor c = getReadableDatabase().rawQuery(
                 "SELECT COUNT(*) FROM " + TABLE + " WHERE mode=0 AND timestamp>=?",
                 new String[]{String.valueOf(todayStart)});
