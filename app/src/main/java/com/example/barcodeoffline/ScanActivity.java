@@ -245,7 +245,7 @@ public class ScanActivity extends ComponentActivity {
         if (selectedFormats.contains("ALL")) {
             options.setDesiredBarcodeFormats(ScanOptions.ALL_CODE_TYPES);
         } else {
-            options.setBarcodeFormats(selectedFormats);
+            options.setDesiredBarcodeFormats(selectedFormats);
         }
         scanLauncher.launch(options);
     }
