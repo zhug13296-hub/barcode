@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -88,26 +89,58 @@ public class ScanDbHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    /** 插入记录；如果最近一条同类型/格式/内容相同，则更新时间并复用原记录 */
+    public long insertOrUpdateLatest(Record record) {
+        if (record.format == null) {
+            return insert(record);
+        }
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor c = db.rawQuery(
+                "SELECT id FROM " + TABLE + " WHERE mode=? AND format=? AND content=? " +
+                        "ORDER BY timestamp DESC LIMIT 1",
+                new String[]{
+                        String.valueOf(record.mode),
+                        record.format,
+                        record.content
+                });
+        try {
+            if (c.moveToFirst()) {
+                long id = c.getLong(0);
+                ContentValues cv = new ContentValues();
+                cv.put("timestamp", record.timestamp);
+                cv.put("batch_index", record.batchIndex);
+                db.update(TABLE, cv, "id=?", new String[]{String.valueOf(id)});
+                record.id = id;
+                return id;
+            }
+        } finally {
+            c.close();
+        }
+        return insert(record);
+    }
+
     /** 查询最近N条记录 */
     public List<Record> queryRecent(int limit) {
-        return query("SELECT * FROM " + TABLE + " ORDER BY timestamp DESC LIMIT " + limit);
+        return query("SELECT * FROM " + TABLE + " ORDER BY timestamp DESC LIMIT ?",
+                new String[]{String.valueOf(limit)});
     }
 
     /** 按关键词搜索 */
     public List<Record> search(String keyword) {
-        return query("SELECT * FROM " + TABLE + " WHERE content LIKE '%" +
-                keyword.replace("'", "''") + "%' ORDER BY timestamp DESC LIMIT 200");
+        return query("SELECT * FROM " + TABLE + " WHERE content LIKE ? ORDER BY timestamp DESC LIMIT 200",
+                new String[]{"%" + keyword + "%"});
     }
 
     /** 按模式筛选 */
     public List<Record> queryByMode(int mode) {
-        return query("SELECT * FROM " + TABLE + " WHERE mode=" + mode + " ORDER BY timestamp DESC LIMIT 200");
+        return query("SELECT * FROM " + TABLE + " WHERE mode=? ORDER BY timestamp DESC LIMIT 200",
+                new String[]{String.valueOf(mode)});
     }
 
     /** 按格式筛选 */
     public List<Record> queryByFormat(String format) {
-        return query("SELECT * FROM " + TABLE + " WHERE format='" +
-                format.replace("'", "''") + "' ORDER BY timestamp DESC LIMIT 200");
+        return query("SELECT * FROM " + TABLE + " WHERE format=? ORDER BY timestamp DESC LIMIT 200",
+                new String[]{format});
     }
 
     /** 删除单条记录 */
@@ -131,7 +164,12 @@ public class ScanDbHelper extends SQLiteOpenHelper {
 
     /** 统计今日扫描数 */
     public int countToday() {
-        long todayStart = System.currentTimeMillis() - (System.currentTimeMillis() % 86400000L);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        long todayStart = calendar.getTimeInMillis();
         Cursor c = getReadableDatabase().rawQuery(
                 "SELECT COUNT(*) FROM " + TABLE + " WHERE mode=0 AND timestamp>=?",
                 new String[]{String.valueOf(todayStart)});
@@ -167,7 +205,7 @@ public class ScanDbHelper extends SQLiteOpenHelper {
     public String exportCsv() {
         StringBuilder sb = new StringBuilder();
         sb.append("ID,类型,格式,内容,时间,批量序号\n");
-        List<Record> records = query("SELECT * FROM " + TABLE + " ORDER BY timestamp DESC");
+        List<Record> records = query("SELECT * FROM " + TABLE + " ORDER BY timestamp DESC", null);
         for (Record r : records) {
             sb.append(r.id).append(",");
             sb.append(r.mode == MODE_SCAN ? "扫描" : "生成").append(",");
@@ -184,7 +222,7 @@ public class ScanDbHelper extends SQLiteOpenHelper {
     public String exportJson() {
         StringBuilder sb = new StringBuilder();
         sb.append("[\n");
-        List<Record> records = query("SELECT * FROM " + TABLE + " ORDER BY timestamp DESC");
+        List<Record> records = query("SELECT * FROM " + TABLE + " ORDER BY timestamp DESC", null);
         for (int i = 0; i < records.size(); i++) {
             Record r = records.get(i);
             sb.append("  {");
@@ -204,9 +242,9 @@ public class ScanDbHelper extends SQLiteOpenHelper {
 
     // ========== 内部方法 ==========
 
-    private List<Record> query(String sql) {
+    private List<Record> query(String sql, String[] selectionArgs) {
         List<Record> list = new ArrayList<>();
-        Cursor c = getReadableDatabase().rawQuery(sql, null);
+        Cursor c = getReadableDatabase().rawQuery(sql, selectionArgs);
         while (c.moveToNext()) {
             Record r = new Record();
             r.id = c.getLong(c.getColumnIndexOrThrow("id"));

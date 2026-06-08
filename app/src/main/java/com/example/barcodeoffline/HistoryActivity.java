@@ -1,12 +1,15 @@
 package com.example.barcodeoffline;
 
 import android.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -42,6 +45,8 @@ public class HistoryActivity extends ComponentActivity {
     private View emptyView;
     private TextView btnCount;
     private ChipGroup filterChips;
+    private Handler searchHandler;
+    private final Runnable searchRunnable = this::loadRecords;
 
     private int currentFilter = -1; // -1=全部, 0=扫描, 1=生成
 
@@ -54,6 +59,7 @@ public class HistoryActivity extends ComponentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
         db = new ScanDbHelper(this);
+        searchHandler = new Handler(Looper.getMainLooper());
 
         searchInput = findViewById(R.id.search_input);
         listView = findViewById(R.id.history_list);
@@ -88,7 +94,7 @@ public class HistoryActivity extends ComponentActivity {
         searchInput.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override public void afterTextChanged(Editable s) { loadRecords(); }
+            @Override public void afterTextChanged(Editable s) { scheduleLoadRecords(); }
         });
 
         initFilterChips();
@@ -105,6 +111,11 @@ public class HistoryActivity extends ComponentActivity {
         });
 
         loadRecords();
+    }
+
+    private void scheduleLoadRecords() {
+        searchHandler.removeCallbacks(searchRunnable);
+        searchHandler.postDelayed(searchRunnable, 250);
     }
 
     private void initFilterChips() {
@@ -125,7 +136,7 @@ public class HistoryActivity extends ComponentActivity {
 
             boolean selected = (filterValue == currentFilter);
             chip.setChipBackgroundColorResource(selected ? R.color.primary : R.color.bg_surface_variant);
-            chip.setTextColor(selected ? Color.WHITE : getResources().getColor(R.color.text_secondary));
+            chip.setTextColor(selected ? Color.WHITE : ContextCompat.getColor(this, R.color.text_secondary));
 
             chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
@@ -146,7 +157,7 @@ public class HistoryActivity extends ComponentActivity {
             chip.setOnCheckedChangeListener(null);
             chip.setChecked(selected);
             chip.setChipBackgroundColorResource(selected ? R.color.primary : R.color.bg_surface_variant);
-            chip.setTextColor(selected ? Color.WHITE : getResources().getColor(R.color.text_secondary));
+            chip.setTextColor(selected ? Color.WHITE : ContextCompat.getColor(this, R.color.text_secondary));
             chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
                     currentFilter = (int) buttonView.getTag();
@@ -232,6 +243,12 @@ public class HistoryActivity extends ComponentActivity {
         ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         cm.setPrimaryClip(ClipData.newPlainText("barcode", value));
         toast("已复制");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        searchHandler.removeCallbacks(searchRunnable);
     }
 
     private void toast(String msg) { Toast.makeText(this, msg, Toast.LENGTH_SHORT).show(); }

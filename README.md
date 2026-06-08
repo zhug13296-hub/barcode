@@ -9,7 +9,8 @@
 - 手动输入内容生成二维码或 Code128 一维码
 - 保存生成图片到相册
 - 分享生成图片
-- 本地历史记录，最多保存 100 条
+- 本地历史记录，支持搜索、筛选和 CSV/JSON 导出
+- 批量扫码和相册图片识别
 - 全部功能离线运行，不需要服务器
 
 ## 技术栈
@@ -17,7 +18,7 @@
 - Android 原生 Java
 - Gradle Android Plugin
 - ZXing / JourneyApps `zxing-android-embedded`
-- SharedPreferences 本地保存历史
+- SQLite 本地保存历史
 
 ## 目录
 
@@ -46,16 +47,26 @@ app/build/outputs/apk/debug/app-debug.apk
 
 ## 命令行打包
 
-前提：本机已安装 JDK 17、Android SDK、Gradle 或使用 Android Studio 自带 Gradle。
+前提：本机已安装 JDK 17 和 Android SDK。命令行构建前需确保 `ANDROID_HOME` 指向 Android SDK 目录，或在项目根目录创建不提交的 `local.properties`：
+
+```properties
+sdk.dir=C:\\Users\\<你的用户名>\\AppData\\Local\\Android\\Sdk
+```
+
+Windows PowerShell 示例：
+
+```powershell
+$env:JAVA_HOME="C:\Path\To\JDK17"
+$env:ANDROID_HOME="C:\Users\<你的用户名>\AppData\Local\Android\Sdk"
+.\gradlew.bat :app:assembleDebug
+```
+
+macOS/Linux 示例：
 
 ```bash
 cd barcode-offline-android
-gradle :app:assembleDebug
-```
-
-或在 Android Studio 中生成 Gradle Wrapper 后执行：
-
-```bash
+export JAVA_HOME=/path/to/jdk17
+export ANDROID_HOME="$HOME/Library/Android/sdk"
 ./gradlew :app:assembleDebug
 ```
 
@@ -67,8 +78,7 @@ gradle :app:assembleDebug
 
 ## 后续可增强
 
-- 历史搜索
 - 收藏常用码
-- 连续扫码模式
-- 文件导出 CSV
-- 更精细的条码格式选择，如 EAN-13、CODE-39
+- Android 13+ Photo Picker
+- 历史列表改为 RecyclerView
+- 结构化解析增加更多类型

@@ -1,8 +1,10 @@
 package com.example.barcodeoffline;
 
 import android.Manifest;
+import androidx.core.content.ContextCompat;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -43,6 +45,8 @@ import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 扫码页面 — 单次/批量模式、闪光灯、格式选择、结构化结果、相册识别
@@ -58,11 +62,14 @@ public class ScanActivity extends ComponentActivity {
 
     private ScanDbHelper db;
     private ScanResultParser.ParsedResult lastParsed;
+    private ExecutorService decodeWorker;
+    private boolean destroyed = false;
 
     // Views
     private TextView titleText, btnScan, btnToggleBatch, btnAction1, btnCopy;
     private TextView resultTypeBadge, resultFormat, resultContent, batchCountView;
-    private LinearLayout resultCard, emptyHint, batchCounterBar, batchResultsContainer;
+    private LinearLayout emptyHint, batchCounterBar, batchResultsContainer;
+    private androidx.cardview.widget.CardView resultCard;
     private ImageView flashBtn;
     private ChipGroup formatChips;
 
@@ -83,6 +90,7 @@ public class ScanActivity extends ComponentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
         db = new ScanDbHelper(this);
+        decodeWorker = Executors.newSingleThreadExecutor();
 
         batchMode = getIntent().getBooleanExtra("batchMode", false);
         boolean openGallery = getIntent().getBooleanExtra("openGallery", false);
@@ -162,7 +170,7 @@ public class ScanActivity extends ComponentActivity {
             chip.setClickable(true);
             chip.setChipBackgroundColorResource(
                     opt[1].equals("ALL") ? R.color.primary : R.color.bg_surface_variant);
-            chip.setTextColor(opt[1].equals("ALL") ? Color.WHITE : getResources().getColor(R.color.text_secondary));
+            chip.setTextColor(opt[1].equals("ALL") ? Color.WHITE : ContextCompat.getColor(this, R.color.text_secondary));
             chip.setChipStrokeColorResource(R.color.outline_variant);
             chip.setChipStrokeWidth(0.5f);
             chip.setChipCornerRadiusResource(R.dimen.radius_full);
@@ -206,7 +214,7 @@ public class ScanActivity extends ComponentActivity {
             chip.setChecked(selected);
             chip.setChipBackgroundColorResource(
                     selected ? R.color.primary : R.color.bg_surface_variant);
-            chip.setTextColor(selected ? Color.WHITE : getResources().getColor(R.color.text_secondary));
+            chip.setTextColor(selected ? Color.WHITE : ContextCompat.getColor(this, R.color.text_secondary));
             // Re-attach listener
             chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 String fmt = (String) buttonView.getTag();
@@ -267,37 +275,73 @@ public class ScanActivity extends ComponentActivity {
 
     /** 从图片URI解码条码 */
     private void decodeFromUri(Uri uri) {
+        toast("正在识别图片...");
+        Collection<com.google.zxing.BarcodeFormat> selectedFmts = getSelectedFormats();
+        decodeWorker.execute(() -> {
+            Bitmap bitmap = null;
+            try {
+                bitmap = decodeSampledBitmap(uri, 1600);
+                if (bitmap == null) {
+                    runOnUiThreadIfActive(() -> toast("无法解码图片"));
+                    return;
+                }
+
+                Map<DecodeHintType, Object> hints = new EnumMap<>(DecodeHintType.class);
+                hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
+                if (selectedFmts != null && !selectedFmts.isEmpty()) {
+                    hints.put(DecodeHintType.POSSIBLE_FORMATS, selectedFmts);
+                }
+
+                Result result = decodeBitmap(bitmap, hints);
+                if (result != null) {
+                    runOnUiThreadIfActive(() -> onScanResult(result.getText(), result.getBarcodeFormat().name()));
+                } else {
+                    runOnUiThreadIfActive(() -> toast("未识别到条码"));
+                }
+            } catch (Exception e) {
+                runOnUiThreadIfActive(() -> toast("识别失败: " + safeMessage(e)));
+            } finally {
+                if (bitmap != null && !bitmap.isRecycled()) {
+                    bitmap.recycle();
+                }
+            }
+        });
+    }
+
+    private Bitmap decodeSampledBitmap(Uri uri, int maxSide) throws Exception {
+        ContentResolver resolver = getContentResolver();
+        BitmapFactory.Options bounds = new BitmapFactory.Options();
+        bounds.inJustDecodeBounds = true;
+        InputStream boundsStream = resolver.openInputStream(uri);
+        if (boundsStream == null) return null;
         try {
-            InputStream is = getContentResolver().openInputStream(uri);
-            if (is == null) {
-                toast("无法读取图片");
-                return;
-            }
-            Bitmap bitmap = BitmapFactory.decodeStream(is);
-            is.close();
-            if (bitmap == null) {
-                toast("无法解码图片");
-                return;
-            }
-
-            Map<DecodeHintType, Object> hints = new EnumMap<>(DecodeHintType.class);
-            hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
-            Collection<com.google.zxing.BarcodeFormat> selectedFmts = getSelectedFormats();
-            if (selectedFmts != null && !selectedFmts.isEmpty()) {
-                hints.put(DecodeHintType.POSSIBLE_FORMATS, selectedFmts);
-            }
-
-            Result result = decodeBitmap(bitmap, hints);
-            if (result != null) {
-                onScanResult(result.getText(), result.getBarcodeFormat().name());
-            } else {
-                toast("未识别到条码");
-            }
-        } catch (com.google.zxing.NotFoundException e) {
-            toast("图片中未找到条码");
-        } catch (Exception e) {
-            toast("识别失败: " + safeMessage(e));
+            BitmapFactory.decodeStream(boundsStream, null, bounds);
+        } finally {
+            boundsStream.close();
         }
+
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null;
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = calculateInSampleSize(bounds.outWidth, bounds.outHeight, maxSide);
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+
+        InputStream decodeStream = resolver.openInputStream(uri);
+        if (decodeStream == null) return null;
+        try {
+            return BitmapFactory.decodeStream(decodeStream, null, options);
+        } finally {
+            decodeStream.close();
+        }
+    }
+
+    private int calculateInSampleSize(int width, int height, int maxSide) {
+        int inSampleSize = 1;
+        int largestSide = Math.max(width, height);
+        while (largestSide / (inSampleSize * 2) >= maxSide) {
+            inSampleSize *= 2;
+        }
+        return inSampleSize;
     }
 
     private Result decodeBitmap(Bitmap bitmap, Map<DecodeHintType, Object> hints) {
@@ -439,7 +483,7 @@ public class ScanActivity extends ComponentActivity {
         TextView typeLabel = new TextView(this);
         typeLabel.setText(" " + parsed.displayType + " · " + record.format);
         typeLabel.setTextSize(12);
-        typeLabel.setTextColor(getResources().getColor(R.color.text_hint));
+        typeLabel.setTextColor(ContextCompat.getColor(this, R.color.text_hint));
         row.addView(typeLabel);
 
         item.addView(row);
@@ -447,7 +491,7 @@ public class ScanActivity extends ComponentActivity {
         TextView content = new TextView(this);
         content.setText(parsed.friendlyValue);
         content.setTextSize(15);
-        content.setTextColor(getResources().getColor(R.color.text_primary));
+        content.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
         content.setPadding(0, dp(4), 0, 0);
         content.setMaxLines(3);
         item.addView(content);
@@ -512,6 +556,13 @@ public class ScanActivity extends ComponentActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        destroyed = true;
+        decodeWorker.shutdownNow();
+    }
+
     private void copyText(String value) {
         ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         cm.setPrimaryClip(ClipData.newPlainText("barcode", value));
@@ -560,6 +611,14 @@ public class ScanActivity extends ComponentActivity {
 
     private void toast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    private void runOnUiThreadIfActive(Runnable action) {
+        runOnUiThread(() -> {
+            if (!destroyed && !isFinishing()) {
+                action.run();
+            }
+        });
     }
 
     private String safeMessage(Exception e) {

@@ -3,9 +3,6 @@ package com.example.barcodeoffline;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiManager;
-import android.provider.ContactsContract;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

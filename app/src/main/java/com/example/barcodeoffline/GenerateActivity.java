@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.MediaScannerConnection;
+import androidx.core.content.ContextCompat;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,6 +33,8 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 生成页面 — Material Chip格式选择、多格式条码生成
@@ -44,6 +47,8 @@ public class GenerateActivity extends ComponentActivity {
     private Bitmap latestBitmap;
     private BarcodeFormat currentFormat = BarcodeFormat.QR_CODE;
     private ScanDbHelper db;
+    private ExecutorService worker;
+    private int generationRequestId = 0;
 
     private static final Object[][] GEN_FORMATS = {
             {"二维码 QR", BarcodeFormat.QR_CODE},
@@ -65,6 +70,7 @@ public class GenerateActivity extends ComponentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_generate);
         db = new ScanDbHelper(this);
+        worker = Executors.newSingleThreadExecutor();
 
         String initValue = getIntent().getStringExtra("initValue");
 
@@ -109,7 +115,7 @@ public class GenerateActivity extends ComponentActivity {
 
             boolean selected = fmt == currentFormat;
             chip.setChipBackgroundColorResource(selected ? R.color.primary : R.color.bg_surface_variant);
-            chip.setTextColor(selected ? Color.WHITE : getResources().getColor(R.color.text_secondary));
+            chip.setTextColor(selected ? Color.WHITE : ContextCompat.getColor(this, R.color.text_secondary));
 
             chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
@@ -130,7 +136,7 @@ public class GenerateActivity extends ComponentActivity {
             chip.setOnCheckedChangeListener(null);
             chip.setChecked(selected);
             chip.setChipBackgroundColorResource(selected ? R.color.primary : R.color.bg_surface_variant);
-            chip.setTextColor(selected ? Color.WHITE : getResources().getColor(R.color.text_secondary));
+            chip.setTextColor(selected ? Color.WHITE : ContextCompat.getColor(this, R.color.text_secondary));
             chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
                     currentFormat = (BarcodeFormat) buttonView.getTag();
@@ -147,18 +153,42 @@ public class GenerateActivity extends ComponentActivity {
             toast("请输入内容");
             return;
         }
-        try {
-            int[] size = getBarcodeSize(currentFormat);
-            latestBitmap = createBarcode(value, currentFormat, size[0], size[1]);
-            previewImage.setImageBitmap(latestBitmap);
-            infoLabel.setText(currentFormat.name() + " · " + size[0] + "×" + size[1] + " · " + value.length() + "字符");
-            db.insert(new ScanDbHelper.Record(ScanDbHelper.MODE_GENERATE, currentFormat.name(), value, 0));
-            toast("已生成");
-        } catch (WriterException e) {
-            toast("生成失败: 该内容不支持此格式");
-        } catch (Exception e) {
-            toast("生成失败: " + e.getMessage());
-        }
+        BarcodeFormat format = currentFormat;
+        int[] size = getBarcodeSize(format);
+        int requestId = ++generationRequestId;
+        infoLabel.setText("正在生成...");
+        worker.execute(() -> {
+            try {
+                Bitmap bitmap = createBarcode(value, format, size[0], size[1]);
+                runOnUiThread(() -> {
+                    if (requestId != generationRequestId || isFinishing()) {
+                        bitmap.recycle();
+                        return;
+                    }
+                    Bitmap oldBitmap = latestBitmap;
+                    latestBitmap = bitmap;
+                    previewImage.setImageBitmap(latestBitmap);
+                    if (oldBitmap != null && oldBitmap != latestBitmap && !oldBitmap.isRecycled()) {
+                        oldBitmap.recycle();
+                    }
+                    infoLabel.setText(format.name() + " · " + size[0] + "×" + size[1] + " · " + value.length() + "字符");
+                    db.insertOrUpdateLatest(new ScanDbHelper.Record(ScanDbHelper.MODE_GENERATE, format.name(), value, 0));
+                    toast("已生成");
+                });
+            } catch (WriterException e) {
+                runOnUiThread(() -> {
+                    if (requestId != generationRequestId || isFinishing()) return;
+                    infoLabel.setText("");
+                    toast("生成失败: 该内容不支持此格式");
+                });
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    if (requestId != generationRequestId || isFinishing()) return;
+                    infoLabel.setText("");
+                    toast("生成失败: " + safeMessage(e));
+                });
+            }
+        });
     }
 
     private int[] getBarcodeSize(BarcodeFormat format) {
@@ -249,6 +279,22 @@ public class GenerateActivity extends ComponentActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        worker.shutdownNow();
+        if (latestBitmap != null && !latestBitmap.isRecycled()) {
+            latestBitmap.recycle();
+            latestBitmap = null;
+        }
+    }
+
     private void toast(String msg) { Toast.makeText(this, msg, Toast.LENGTH_SHORT).show(); }
+    private String safeMessage(Exception e) {
+        String message = e.getMessage();
+        return message == null || message.trim().isEmpty()
+                ? e.getClass().getSimpleName()
+                : message;
+    }
     private int dp(int value) { return (int) (value * getResources().getDisplayMetrics().density + 0.5f); }
 }
