@@ -13,6 +13,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.Gravity;
@@ -40,11 +42,16 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -58,12 +65,14 @@ public class ScanActivity extends AppCompatActivity {
     private int batchCount = 0;
     private int batchIndex = 0;
     private final List<ScanDbHelper.Record> batchRecords = new ArrayList<>();
+    private final Set<String> batchContents = new HashSet<>();
     private final List<String> selectedFormats = new ArrayList<>();
     private boolean autoScanMode = false;
 
     private ScanDbHelper db;
     private ScanResultParser.ParsedResult lastParsed;
     private ExecutorService decodeWorker;
+    private Handler mainHandler;
     private boolean destroyed = false;
 
     // Views
@@ -76,6 +85,16 @@ public class ScanActivity extends AppCompatActivity {
 
     private ActivityResultLauncher<ScanOptions> scanLauncher;
     private ActivityResultLauncher<String> galleryLauncher;
+    private final Runnable batchScanRunnable = () -> {
+        if (!destroyed && batchMode) {
+            startScan();
+        }
+    };
+    private final Runnable autoScanRunnable = () -> {
+        if (!destroyed && !batchMode && autoScanMode) {
+            startScan();
+        }
+    };
 
     // 格式选项
     private static final String[][] FORMAT_OPTIONS = {
@@ -92,6 +111,7 @@ public class ScanActivity extends AppCompatActivity {
         setContentView(R.layout.activity_scan);
         db = new ScanDbHelper(this);
         decodeWorker = Executors.newSingleThreadExecutor();
+        mainHandler = new Handler(Looper.getMainLooper());
 
         batchMode = getIntent().getBooleanExtra("batchMode", false);
         boolean openGallery = getIntent().getBooleanExtra("openGallery", false);
@@ -153,8 +173,7 @@ public class ScanActivity extends AppCompatActivity {
         });
         btnAction1.setOnClickListener(v -> {
             if (lastParsed != null) {
-                startActivity(new Intent(this, GenerateActivity.class)
-                    .putExtra("initValue", lastParsed.rawValue));
+                handlePrimaryAction(lastParsed);
             }
         });
         findViewById(R.id.btn_export_batch).setOnClickListener(v -> exportBatch());
@@ -256,7 +275,7 @@ public class ScanActivity extends AppCompatActivity {
         }
         ScanOptions options = new ScanOptions();
         options.setPrompt("将条码放入框内自动识别");
-        options.setBeepEnabled(true);
+        options.setBeepEnabled(ScanPreferences.getSoundEnabled(this));
         options.setBarcodeImageEnabled(false);
         options.setOrientationLocked(false);
         options.setTorchEnabled(flashOn);
@@ -454,13 +473,13 @@ public class ScanActivity extends AppCompatActivity {
             batchRecords.add(record);
             batchCountView.setText("已扫: " + batchCount);
             addBatchResultItem(record, lastParsed);
-            btnScan.postDelayed(this::startScan, 350);
+            scheduleBatchScan();
         } else {
             showSingleResult(lastParsed, safeFormatName);
             if (autoScanMode) {
                 View autoScanIndicator = findViewById(R.id.auto_scan_indicator);
                 if (autoScanIndicator != null) autoScanIndicator.setVisibility(View.VISIBLE);
-                btnScan.postDelayed(this::startScan, 500);
+                scheduleAutoScan();
             }
         }
     }
@@ -469,17 +488,24 @@ public class ScanActivity extends AppCompatActivity {
         emptyHint.setVisibility(View.GONE);
         resultCard.setVisibility(View.VISIBLE);
 
-        resultTypeBadge.setText(formatName);
-        resultFormat.setText("");
-        resultContent.setText(lastParsed.rawValue);
+        resultTypeBadge.setText("扫码结果");
+        resultFormat.setText(formatName);
+        resultContent.setText(parsed.rawValue);
+        btnAction1.setText("继续扫码");
+    }
+
+    private void handlePrimaryAction(ScanResultParser.ParsedResult parsed) {
+        startScan();
     }
 
     private void addBatchResultItem(ScanDbHelper.Record record, ScanResultParser.ParsedResult parsed) {
         batchResultsContainer.setVisibility(View.VISIBLE);
+        boolean duplicate = batchContents.contains(record.content);
+        batchContents.add(record.content);
 
         LinearLayout item = new LinearLayout(this);
         item.setOrientation(LinearLayout.VERTICAL);
-        item.setBackgroundResource(R.drawable.bg_card_static);
+        item.setBackgroundResource(duplicate ? R.drawable.bg_batch_duplicate : R.drawable.bg_card_static);
         item.setPadding(dp(14), dp(10), dp(14), dp(10));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -491,7 +517,7 @@ public class ScanActivity extends AppCompatActivity {
         row.setGravity(Gravity.CENTER_VERTICAL);
 
         TextView badge = new TextView(this);
-        badge.setText("#" + record.batchIndex);
+        badge.setText(duplicate ? "重复" : "#" + record.batchIndex);
         badge.setTextSize(12);
         badge.setTextColor(Color.WHITE);
         badge.setBackgroundResource(R.drawable.bg_badge);
@@ -523,14 +549,27 @@ public class ScanActivity extends AppCompatActivity {
 
     private void toggleBatchMode() {
         batchMode = !batchMode;
+        mainHandler.removeCallbacks(batchScanRunnable);
+        mainHandler.removeCallbacks(autoScanRunnable);
         if (batchMode) {
             batchCount = 0;
             batchIndex = 0;
             batchRecords.clear();
+            batchContents.clear();
             batchResultsContainer.removeAllViews();
             batchResultsContainer.setVisibility(View.GONE);
         }
         updateBatchUI();
+    }
+
+    private void scheduleBatchScan() {
+        mainHandler.removeCallbacks(batchScanRunnable);
+        mainHandler.postDelayed(batchScanRunnable, 350);
+    }
+
+    private void scheduleAutoScan() {
+        mainHandler.removeCallbacks(autoScanRunnable);
+        mainHandler.postDelayed(autoScanRunnable, 500);
     }
 
     private void updateBatchUI() {
@@ -549,9 +588,12 @@ public class ScanActivity extends AppCompatActivity {
         }
         StringBuilder csv = new StringBuilder();
         csv.append("\uFEFF"); // UTF-8 BOM for Excel compatibility
-        csv.append("条码内容\n");
+        csv.append("序号,条码内容,扫描时间\n");
         for (ScanDbHelper.Record r : batchRecords) {
-            csv.append(escapeCsv(r.content)).append("\n");
+            csv.append(r.batchIndex).append(",");
+            csv.append(escapeCsv(r.content)).append(",");
+            csv.append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA)
+                    .format(new Date(r.timestamp))).append("\n");
         }
         shareText(csv.toString(), "batch_scan_" + System.currentTimeMillis() + ".csv", "text/csv");
     }
@@ -577,6 +619,8 @@ public class ScanActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         destroyed = true;
+        mainHandler.removeCallbacks(batchScanRunnable);
+        mainHandler.removeCallbacks(autoScanRunnable);
         decodeWorker.shutdownNow();
     }
 

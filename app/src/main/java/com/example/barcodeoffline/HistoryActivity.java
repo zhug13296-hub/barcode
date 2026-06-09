@@ -176,7 +176,7 @@ public class HistoryActivity extends AppCompatActivity {
     private void loadRecords() {
         String keyword = searchInput.getText().toString().trim();
         if (!keyword.isEmpty()) {
-            currentRecords = db.search(keyword);
+            currentRecords = db.search(keyword, currentFilter);
         } else if (currentFilter == 0) {
             currentRecords = db.queryByMode(ScanDbHelper.MODE_SCAN);
         } else if (currentFilter == 1) {

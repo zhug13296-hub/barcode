@@ -146,7 +146,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="支持 QR / EAN / UPC / DataMatrix / PDF417 等"
+                    android:text="结果只做保存、复制和导出"
                     android:textSize="13sp"
                     android:textColor="@color/text_hint"
                     android:letterSpacing="0.02" />
@@ -228,11 +228,11 @@
                             android:layout_weight="1"
                             android:background="@drawable/bg_btn_primary"
                             android:gravity="center"
-                            android:text="生成条码"
+                            android:text="继续扫码"
                             android:textColor="@color/on_primary"
                             android:textSize="14sp"
                             android:fontFamily="sans-serif-medium"
-                            android:drawableStart="@drawable/ic_generate"
+                            android:drawableStart="@drawable/ic_scan"
                             android:drawablePadding="6dp"
                             android:layout_marginEnd="6dp"
                             android:clickable="true"

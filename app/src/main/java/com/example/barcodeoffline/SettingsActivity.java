@@ -128,6 +128,11 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void saveSettings() {
+        if (selectedFgColor == selectedBgColor) {
+            Toast.makeText(this, "前景色和背景色不能相同", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         ScanPreferences.setVibrationEnabled(this, switchVibration.isChecked());
         ScanPreferences.setSoundEnabled(this, switchSound.isChecked());
         ScanPreferences.setAutoScanEnabled(this, switchAutoScan.isChecked());

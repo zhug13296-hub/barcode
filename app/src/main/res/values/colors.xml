@@ -1,58 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Primary palette -->
-    <color name="primary">#2563EB</color>
-    <color name="primary_dark">#1D4ED8</color>
-    <color name="primary_light">#60A5FA</color>
-    <color name="primary_container">#DBEAFE</color>
+    <color name="primary">#7B5B3A</color>
+    <color name="primary_dark">#5E452C</color>
+    <color name="primary_light">#A57C52</color>
+    <color name="primary_container">#F1E3CF</color>
     <color name="on_primary">#FFFFFF</color>
-    <color name="on_primary_container">#1E3A8A</color>
+    <color name="on_primary_container">#3B2818</color>
 
     <!-- Accent / CTA -->
-    <color name="accent">#F59E0B</color>
-    <color name="accent_light">#FCD34D</color>
-    <color name="accent_container">#FEF3C7</color>
+    <color name="accent">#C08B4B</color>
+    <color name="accent_light">#E2B979</color>
+    <color name="accent_container">#F5E7CF</color>
     <color name="on_accent">#FFFFFF</color>
 
     <!-- Background layer -->
-    <color name="bg_primary">#F1F5F9</color>
-    <color name="bg_surface">#FFFFFF</color>
-    <color name="bg_surface_variant">#F1F5F9</color>
-    <color name="bg_surface_elevated">#FFFFFF</color>
+    <color name="bg_primary">#FBF6E9</color>
+    <color name="bg_surface">#FFFCF2</color>
+    <color name="bg_surface_variant">#F4EAD8</color>
+    <color name="bg_surface_elevated">#FFF8E8</color>
 
     <!-- Text -->
-    <color name="text_primary">#0F172A</color>
-    <color name="text_secondary">#475569</color>
-    <color name="text_hint">#94A3B8</color>
-    <color name="text_on_surface">#0F172A</color>
+    <color name="text_primary">#2C1E0F</color>
+    <color name="text_secondary">#7A6550</color>
+    <color name="text_hint">#B09A80</color>
+    <color name="text_on_surface">#2C1E0F</color>
 
     <!-- Functional colors -->
-    <color name="success">#10B981</color>
-    <color name="success_container">#D1FAE5</color>
-    <color name="warning">#F59E0B</color>
-    <color name="warning_container">#FEF3C7</color>
-    <color name="error">#EF4444</color>
-    <color name="error_container">#FEE2E2</color>
-    <color name="info">#3B82F6</color>
-    <color name="info_container">#DBEAFE</color>
+    <color name="success">#6F8F4E</color>
+    <color name="success_container">#E6EDD8</color>
+    <color name="warning">#C08B4B</color>
+    <color name="warning_container">#F5E7CF</color>
+    <color name="error">#B85C4A</color>
+    <color name="error_container">#F2D7CF</color>
+    <color name="info">#7B5B3A</color>
+    <color name="info_container">#F1E3CF</color>
 
     <!-- Badge colors -->
-    <color name="badge_scan">#10B981</color>
-    <color name="badge_generate">#2563EB</color>
-    <color name="badge_batch">#8B5CF6</color>
+    <color name="badge_scan">#6F8F4E</color>
+    <color name="badge_generate">#7B5B3A</color>
+    <color name="badge_batch">#9B6B43</color>
 
     <!-- Borders / Dividers -->
-    <color name="outline">#CBD5E1</color>
-    <color name="outline_variant">#E2E8F0</color>
-    <color name="divider">#E2E8F0</color>
+    <color name="outline">#D8CAB2</color>
+    <color name="outline_variant">#E6DAC8</color>
+    <color name="divider">#E6DAC8</color>
 
     <!-- System bars -->
-    <color name="status_bar">#EFF6FF</color>
-    <color name="nav_bar">#FFFFFF</color>
+    <color name="status_bar">#FBF6E9</color>
+    <color name="nav_bar">#FFFCF2</color>
 
     <!-- Ripple -->
-    <color name="ripple">#202563EB</color>
-    <color name="ripple_light">#15F59E0B</color>
+    <color name="ripple">#207B5B3A</color>
+    <color name="ripple_light">#15C08B4B</color>
 
     <!-- Pure colors -->
     <color name="white">#FFFFFF</color>
