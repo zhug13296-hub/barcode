@@ -491,11 +491,12 @@ public class ScanActivity extends AppCompatActivity {
         resultTypeBadge.setText("扫码结果");
         resultFormat.setText(formatName);
         resultContent.setText(parsed.rawValue);
-        btnAction1.setText("继续扫码");
+        btnAction1.setText("生成条码");
     }
 
     private void handlePrimaryAction(ScanResultParser.ParsedResult parsed) {
-        startScan();
+        startActivity(new Intent(this, GenerateActivity.class)
+                .putExtra("initValue", parsed.rawValue));
     }
 
     private void addBatchResultItem(ScanDbHelper.Record record, ScanResultParser.ParsedResult parsed) {
